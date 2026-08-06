@@ -72,7 +72,19 @@ logit read; the only fidelity gap is reading top-20 logprobs instead of raw logi
 one parameter — a battery file or an HF dataset slug — and `examples/sweep_metrics.py`
 computes balanced accuracy / AUROC tables from the eval logs.
 
-To reproduce the competition runs exactly instead, go through the NDIF harness — each
+The frozen harness methods themselves also run **fully locally** — same pipeline, no NDIF
+account, models dispatched onto your GPUs (`methods/*/local_test.py`; Polypheides needs
+only the 9B judge, ~20 GB; Tiresias also loads the suspect model, so a 27B suspect wants
+2×48 GB and the Nemotron-120B cells are NDIF-only territory):
+
+```bash
+cd methods/polypheides
+ALETHEIA_METHOD=rhadamanthys_dyad_anchor2h \
+DATASET_NAME=aletheias-quest/dev-varied-deception-Qwen3.5-27B-a-mo-qwen3.5-27b-4 \
+  python local_test.py     # add ALETHEIA_LIMIT=8 for a smoke run
+```
+
+To reproduce the competition runs exactly as submitted, go through the NDIF harness — each
 method directory is a standalone submission bundle with the harness entry point included:
 
 ```bash

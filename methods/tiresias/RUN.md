@@ -36,6 +36,16 @@ competition harness (`submission/harness.py` via `submission/remote_test.py`), w
 `build_model_fn` (NDIF/nnsight remote model factory, see `submission/util.py::build_model`) and
 the dataset rows. In the source repo, one dataset:
 
+**No NDIF? Run locally** — `local_test.py` runs the same frozen pipeline with all models
+dispatched onto local GPUs (needs CUDA torch + nnsight + accelerate; see the repo's
+`requirements-local.txt`). This method loads BOTH the 9B judge and the suspect model named
+in the dataset rows: a 27B suspect needs ~2×48 GB GPUs (set `CUDA_VISIBLE_DEVICES`), and
+the Nemotron-120B suspect (~240 GB) is realistically NDIF-only.
+
+```bash
+ALETHEIA_METHOD=rhadamanthys_m53_tp DATASET_NAME=<...> python local_test.py
+```
+
 This bundle ships the harness entry point (`remote_test.py`, `harness.py`, `util.py`), so it
 runs standalone from this directory:
 

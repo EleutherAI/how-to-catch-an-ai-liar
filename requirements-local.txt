@@ -9,3 +9,6 @@ transformers
 accelerate
 datasets
 numpy
+# local_test.py (running the frozen harness methods without NDIF) additionally needs:
+nnsight
+pandas
