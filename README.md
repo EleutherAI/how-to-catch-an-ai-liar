@@ -12,48 +12,41 @@ each). Entrants never saw the organisms and never read a labelled test row.
 
 ## Quick start
 
-One GPU (~24 GB), no NDIF account needed — run our black-box method with a local
-Qwen3.5-9B judge on one of the bundled datasets:
+Everything runs locally with nnsight — models on your own GPUs, no NDIF account or API
+key. The judge (Qwen3.5-9B) needs one ~24 GB GPU. One dependency set (`pyproject.toml`):
 
 ```bash
 git clone https://github.com/reinthal/how-to-catch-an-ai-liar
 cd how-to-catch-an-ai-liar
-uv venv --python 3.12 .venv-local && source .venv-local/bin/activate
-uv pip install -r requirements-local.txt
+uv sync && source .venv/bin/activate
 
-inspect eval examples/inspect_polypheides.py -T hf_dataset=datasets/data/wf_assert.jsonl
-inspect view    # browse per-row transcripts, judge outputs, margins, scores
+python run.py --method abantes --dataset wf_assert --limit 16
 ```
 
-`datasets/data/` contains all 27 evaluation distributions ([docs](datasets/README.md));
-swap in any of them, or an HF slug like `reinthal/notus-lie-auditor-Qwen3.5-27B`. Try
-`wf_assert` vs `wf_denial` to see the claim-shape effect from the post: the same lies with
-an extractable false claim (caught) and as bare denials (missed).
-
-## Run any method on any dataset
-
-`run.py` is the batteries-included entry point: any of the three frozen submission methods
-× any bundled battery dataset or HF dataset pair, on your GPUs or on NDIF — no
-competition dev sets needed (those may not remain public; everything referenced here ships
-in this repo or on the [`reinthal`](https://huggingface.co/reinthal) HF account):
+`run.py` runs any of the three frozen submission methods on any dataset:
 
 ```bash
-# a frozen submission on a bundled dataset, locally (judge on one GPU)
-python run.py --method abantes --dataset wf_assert --limit 16
+# --dataset takes a bundled battery id (all 27 in datasets/data/, docs in datasets/README.md) ...
+python run.py --method abantes --dataset wf_assert
 
-# same method on our on-policy lie-auditor set from HF (labels auto-joined for metrics)
+# ... a path to a battery-format .jsonl ...
+python run.py --method polypheides --dataset datasets/data/lb_instructed.jsonl
+
+# ... or an HF slug following the <slug> + <slug>-labels convention
 python run.py --method polypheides --dataset reinthal/notus-lie-auditor-Qwen3.5-27B
-
-# the white-box stack, on NDIF (needs NDIF_API_KEY); --suspect loads a suspect model,
-# --blind forces judge-legs-only
-python run.py --method tiresias --dataset ga_insider --backend ndif
 ```
 
-It writes the competition deliverable (`submission.csv`) and, when labels exist, prints
-AUROC / balanced accuracy **plus the dataset's recorded blind and length nulls** — the bar
-a detector has to beat before claiming it read the lie rather than the setup. Battery
-datasets run blind by default (the judge methods never need the suspect); pass
-`--suspect "model[:lora]"` to give Tiresias a suspect to read.
+Every run writes `submission.csv` (`index, deceptive, score` — the competition deliverable)
+and, when labels exist, prints AUROC / balanced accuracy **plus the dataset's recorded
+blind and length nulls** — the bar a detector has to beat before claiming it read the lie
+rather than the setup.
+
+Flags: `--limit N` scores only the first N rows; `--suspect "model[:lora]"` gives Tiresias
+a suspect model to read (battery datasets run blind by default — the judge methods never
+need the suspect); `--blind` forces judge-legs-only; `--backend ndif` runs the models
+remotely on NDIF instead, for those with an `NDIF_API_KEY`. Try `wf_assert` vs `wf_denial`
+to see the claim-shape effect from the post: the same lies with an extractable false claim
+(caught) and as bare denials (missed).
 
 ## The two methods
 
@@ -108,33 +101,32 @@ on the scored data), and the wrapper's in-batch keep-band/median statistics are 
 in-repo as non-compliant with the organisers' later fixed-per-sample-threshold ruling.
 Polypheides is the compliant lineage under that ruling.
 
-## Quick start (NDIF)
+## Other entry points
 
-The quick start above uses `examples/inspect_polypheides.py`, a faithful
-[Inspect](https://inspect.aisi.org.uk/) port of the submission (same prompts, same mirrored
-logit read; the only fidelity gap is reading top-20 logprobs instead of raw logits). It takes
-one parameter — a battery file or an HF dataset slug — and `examples/sweep_metrics.py`
-computes balanced accuracy / AUROC tables from the eval logs.
-
-For most uses prefer `run.py` above — it wraps the same harness. The per-bundle entry
-points remain for exact reproduction: each method directory is a standalone submission
-bundle, runnable fully locally (`local_test.py` — Polypheides/Abantes need only the 9B
-judge, ~20 GB; Tiresias also loads the suspect, so a 27B suspect wants 2×48 GB and the
-Nemotron-120B cells are NDIF-only territory) or against NDIF exactly as submitted
-(`remote_test.py`):
+`examples/inspect_polypheides.py` is a faithful [Inspect](https://inspect.aisi.org.uk/)
+port of the DYAD anchor (same prompts, same mirrored logit read; the only fidelity gap is
+reading top-20 logprobs instead of raw logits) — useful for browsing per-row transcripts,
+judge outputs and margins in a UI:
 
 ```bash
-uv venv --python 3.12 .venv && UV_TORCH_BACKEND=cpu uv pip install -r requirements-ndif.txt
-cd methods/abantes        # or methods/polypheides, methods/tiresias
-NDIF_API_KEY=... HF_TOKEN=... \
-DATASET_NAME=reinthal/notus-lie-auditor-Qwen3.5-27B \
-  python remote_test.py   # or local_test.py for local GPUs
+inspect eval examples/inspect_polypheides.py -T hf_dataset=datasets/data/wf_assert.jsonl
+inspect view
 ```
 
-Writes `submission.csv` (`index, deceptive, score` — the competition deliverable). Add
-`ALETHEIA_LIMIT=16` for a smoke run; each bundle's default `ALETHEIA_METHOD` is its own
-submission. The `RUN.md` files also document the original competition dev-set invocations
-(`aletheias-quest/dev-*` slugs), which may not remain publicly downloadable.
+For exact reproduction of the competition runs, each method directory is a standalone
+submission bundle with its own entry points — `local_test.py` (local GPUs, same models)
+and `remote_test.py` (NDIF, exactly as submitted; needs `NDIF_API_KEY`):
+
+```bash
+cd methods/abantes        # or methods/polypheides, methods/tiresias
+DATASET_NAME=reinthal/notus-lie-auditor-Qwen3.5-27B python local_test.py
+```
+
+Add `ALETHEIA_LIMIT=16` for a smoke run; each bundle's default `ALETHEIA_METHOD` is its
+own submission. Tiresias loads the suspect model (a 27B suspect wants 2×48 GB GPUs; the
+Nemotron-120B cells are NDIF-only territory). The `RUN.md` files also document the
+original competition dev-set invocations (`aletheias-quest/dev-*` slugs), which may not
+remain publicly downloadable.
 
 ## The datasets
 
@@ -177,7 +169,7 @@ methods/tiresias/      white-box submission: method stack, probe artifacts (.npz
 examples/              local-GPU Inspect port of the DYAD anchor + metrics script
 datasets/              the 27-distribution evaluation battery: data/, manifest, loader, docs
 DATASETS.md            dataset inventory and battery manifest summary
-requirements-*.txt     NDIF-client and local-GPU dependency sets
+pyproject.toml         one dependency set for the whole local workflow (uv sync)
 ```
 
 Team EleutherAI: Stella Binderman (EleutherAI), Gonçalo Paulo (EleutherAI), Giuseppe

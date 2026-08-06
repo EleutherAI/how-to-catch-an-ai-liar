@@ -14,7 +14,7 @@
 Writes submission.csv (index, deceptive, score) and, when the dataset carries labels,
 prints AUROC / balanced accuracy against them plus the dataset's recorded nulls.
 
-Backend notes: local runs need CUDA torch + nnsight + accelerate (requirements-local.txt).
+Backend notes: local runs need CUDA torch + nnsight + accelerate (pyproject.toml — uv sync).
 The judge (Qwen3.5-9B) needs ~20 GB. Tiresias additionally loads a suspect model — by
 default battery datasets run BLIND (judge legs only); pass --suspect "model[:lora]" to
 load one (a 27B suspect wants ~2x48 GB GPUs).

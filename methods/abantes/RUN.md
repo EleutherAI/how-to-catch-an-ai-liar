@@ -78,6 +78,5 @@ Result: **PASS** — module imports cleanly with all seals asserted (T=2.0,
 ## No NDIF? Run locally
 
 `python local_test.py` with the same env vars runs the identical pipeline with the judge on
-your own GPU (~20 GB bf16; needs CUDA torch + nnsight + accelerate — see the repo's
-`requirements-local.txt`). Both channels are judge-only, so the suspect model is never
+your own GPU (~20 GB bf16; needs CUDA torch + nnsight + accelerate — install with `uv sync` from the repo root). Both channels are judge-only, so the suspect model is never
 loaded and one GPU suffices.

@@ -34,7 +34,7 @@ DATASET_NAME=aletheias-quest/dev-varied-deception-Qwen3.5-27B-a-mo-qwen3.5-27b-4
 - Add `ALETHEIA_LIMIT=16` for a quick smoke run.
 - **No NDIF? Run locally**: `python local_test.py` with the same env vars runs the identical
   pipeline with the judge on your own GPU (~20 GB bf16; needs CUDA torch + nnsight +
-  accelerate, see the repo's `requirements-local.txt`). This method never loads the suspect
+  accelerate, install with `uv sync` from the repo root). This method never loads the suspect
   model, so one GPU suffices.
 - Output: `submission.csv` in the current directory, columns `index, deceptive, score`
   (`deceptive == (score >= 0.5)`; the method's margin makes 0.5 the natural per-sample threshold —

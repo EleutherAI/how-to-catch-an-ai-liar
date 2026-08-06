@@ -1,0 +1,26 @@
+[project]
+name = "how-to-catch-an-ai-liar"
+version = "1.0.0"
+description = "Deception-detection methods and datasets from Aletheia's Quest — run any method on any dataset on local GPUs"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "torch",
+    "transformers",
+    "accelerate",
+    "datasets",
+    "nnsight",
+    "pandas",
+    "numpy",
+    "pillow",     # Qwen3.5 is a multimodal arch; its image-processor imports PIL at load
+    "peft",       # LoRA suspects (--suspect model:lora), merged into base weights
+    "inspect-ai>=0.3.251",   # examples/inspect_polypheides.py
+]
+
+[tool.uv]
+package = false
+
+[project.optional-dependencies]
+# faster Qwen3.5 inference: custom kernels for its linear-attention/conv layers
+# (needs nvcc; without these transformers uses a slower pure-torch fallback)
+fast = ["flash-linear-attention", "causal-conv1d"]
