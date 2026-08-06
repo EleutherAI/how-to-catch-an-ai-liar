@@ -9,6 +9,8 @@ transformers
 accelerate
 datasets
 numpy
-# local_test.py (running the frozen harness methods without NDIF) additionally needs:
+# run.py / local_test.py (running the frozen harness methods without NDIF) additionally need:
 nnsight
 pandas
+pillow    # Qwen3.5 is a multimodal arch; its image-processor class imports PIL at load
+peft      # only for LoRA suspects (--suspect model:lora); merged into base weights
