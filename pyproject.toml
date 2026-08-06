@@ -16,6 +16,7 @@ dependencies = [
     "peft",       # LoRA suspects (--suspect model:lora), merged into base weights
     "inspect-ai>=0.3.251",   # examples/inspect_polypheides.py
     "torchvision>=0.28.0",
+    "scikit-learn>=1.9.0",
 ]
 
 [tool.uv]
