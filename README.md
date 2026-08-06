@@ -10,6 +10,27 @@ and asked entrants to score every transcript between honest and deceptive. Entri
 by mean AUROC over six held-out cells (two organism families × three base models, 400 rows
 each). Entrants never saw the organisms and never read a labelled test row.
 
+## Quick start
+
+One GPU (~24 GB), no NDIF account needed — run our black-box method with a local
+Qwen3.5-9B judge on one of the bundled datasets:
+
+```bash
+git clone https://github.com/reinthal/how-to-catch-an-ai-liar
+cd how-to-catch-an-ai-liar
+uv venv --python 3.12 .venv-local && source .venv-local/bin/activate
+uv pip install -r requirements-local.txt
+
+inspect eval examples/inspect_polypheides.py -T hf_dataset=datasets/data/wf_assert.jsonl
+inspect view    # browse per-row transcripts, judge outputs, margins, scores
+```
+
+`datasets/data/` contains all 27 evaluation distributions ([docs](datasets/README.md));
+swap in any of them, or an HF slug like `reinthal/notus-lie-auditor-Qwen3.5-27B`. Try
+`wf_assert` vs `wf_denial` to see the claim-shape effect from the post: the same lies with
+an extractable false claim (caught) and as bare denials (missed). To run the methods
+through the competition's NDIF harness instead, see [Quick start (NDIF)](#quick-start-ndif).
+
 ## The two methods
 
 ### Polypheides — black-box trusted judge (`methods/polypheides/`)
@@ -43,25 +64,16 @@ on the scored data), and the wrapper's in-batch keep-band/median statistics are 
 in-repo as non-compliant with the organisers' later fixed-per-sample-threshold ruling.
 Polypheides is the compliant lineage under that ruling.
 
-## Quick start
+## Quick start (NDIF)
 
-**Local, no NDIF** — run Polypheides with the judge on your own GPU (~24 GB) via
-[Inspect](https://inspect.aisi.org.uk/):
+The quick start above uses `examples/inspect_polypheides.py`, a faithful
+[Inspect](https://inspect.aisi.org.uk/) port of the submission (same prompts, same mirrored
+logit read; the only fidelity gap is reading top-20 logprobs instead of raw logits). It takes
+one parameter — a battery file or an HF dataset slug — and `examples/sweep_metrics.py`
+computes balanced accuracy / AUROC tables from the eval logs.
 
-```bash
-uv venv --python 3.12 .venv-local && source .venv-local/bin/activate
-uv pip install -r requirements-local.txt
-inspect eval examples/inspect_polypheides.py -T hf_dataset=reinthal/notus-lie-auditor-Qwen3.5-27B
-inspect view   # browse per-row transcripts, margins, scores
-```
-
-`examples/inspect_polypheides.py` is a faithful port of the submission (same prompts, same
-mirrored logit read; the only fidelity gap is reading top-20 logprobs instead of raw logits).
-It takes one parameter — an HF dataset slug — and parses the organism and task out of it.
-`examples/sweep_metrics.py` computes balanced accuracy / AUROC tables from the eval logs.
-
-**Through the competition harness (NDIF)** — each method directory is a standalone
-submission bundle with the harness entry point included:
+To reproduce the competition runs exactly instead, go through the NDIF harness — each
+method directory is a standalone submission bundle with the harness entry point included:
 
 ```bash
 uv venv --python 3.12 .venv && UV_TORCH_BACKEND=cpu uv pip install -r requirements-ndif.txt
@@ -78,9 +90,19 @@ Writes `submission.csv` (`index, deceptive, score` — the competition deliverab
 
 ## The datasets
 
-`DATASETS.md` is the full inventory: the datasets we publish on Hugging Face under
-[`reinthal`](https://huggingface.co/reinthal) and the 27-distribution / 6,136-row evaluation
-battery described in section 9 of the post. Highlights:
+**The evaluation battery ships in this repo**: `datasets/data/` holds all 27 distributions
+(6,136 labelled rows, ~16 MB) with the manifest (`datasets/gauntlet.json`), a
+dependency-free loader (`datasets/load.py`), and per-distribution documentation of the
+lie types, claim shapes, evidence loci and dataset nulls in
+[`datasets/README.md`](datasets/README.md). Run Polypheides on any of them directly:
+
+```bash
+inspect eval examples/inspect_polypheides.py -T hf_dataset=datasets/data/wf_denial.jsonl
+```
+
+`DATASETS.md` is the wider inventory: the datasets we publish on Hugging Face under
+[`reinthal`](https://huggingface.co/reinthal) plus the battery's reconciliation against
+the blog post. Highlights:
 
 - **`reinthal/notus-lie-auditor-{Qwen3.5-27B, gemma-3-27b-it, NVIDIA-Nemotron-3-Super-120B}`**
   (+ `-labels`) — 899 on-policy agentic lie-auditor transcripts in the Järviniemi & Hubinger
@@ -103,6 +125,7 @@ labels = load_dataset("reinthal/notus-lie-auditor-Qwen3.5-27B-labels", split="te
 methods/polypheides/   black-box submission: notebook, method + judge modules, harness, provenance
 methods/tiresias/      white-box submission: method stack, probe artifacts (.npz), harness, provenance
 examples/              local-GPU Inspect port of Polypheides + metrics script
+datasets/              the 27-distribution evaluation battery: data/, manifest, loader, docs
 DATASETS.md            dataset inventory and battery manifest summary
 requirements-*.txt     NDIF-client and local-GPU dependency sets
 ```

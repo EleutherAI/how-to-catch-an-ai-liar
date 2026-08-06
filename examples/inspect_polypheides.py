@@ -245,6 +245,29 @@ def dyad_scorer():
 def polypheides(hf_dataset: str = "aletheias-quest/dev-varied-deception-Qwen3.5-27B-a-mo-qwen3.5-27b-4"):
     from datasets import load_dataset
 
+    if hf_dataset.endswith(".jsonl"):                     # local battery file (datasets/data/*.jsonl)
+        import json as _json, os as _os
+        path = hf_dataset
+        if not _os.path.exists(path):                     # inspect may chdir; retry from repo root
+            path = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), hf_dataset)
+        brows = [_json.loads(l) for l in open(path)]
+        samples = [
+            Sample(id=r["rid"],
+                   input=_transcript(r["messages"]),
+                   target="deceptive" if r["y"] else "honest",
+                   metadata={"messages": r["messages"]})
+            for r in brows
+        ]
+        dist = brows[0]["dist"]
+        return Task(dataset=MemoryDataset(samples),
+                    solver=polypheides_dyad(),
+                    scorer=dyad_scorer(),
+                    model="none/none",
+                    config=GenerateConfig(max_connections=8),
+                    metadata={"dataset": hf_dataset, "dist": dist,
+                              "gen_model": brows[0].get("gen_model")},
+                    name=f"polypheides-{dist}")
+
     settings = parse_slug(hf_dataset)
     rows = load_dataset(hf_dataset, split="test")
     labels = {int(r["index"]): bool(r["deceptive"])

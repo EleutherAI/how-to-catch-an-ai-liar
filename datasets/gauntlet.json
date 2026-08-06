@@ -1,0 +1,897 @@
+{
+ "dists": {
+  "lb_instructed": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "instructed factual lie (matched)",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "gemma-3-27b-it",
+    "llama-v3.3-70b-instruct",
+    "mistral-small-3.1-24b-instruct",
+    "qwen-2.5-72b-instruct"
+   ],
+   "flags": [],
+   "notes": "BOTH classes are lie-instructed rows; honest = model ignored the instruction. Kills the instruction->label context leak.",
+   "path": "data/lb_instructed.jsonl",
+   "n": 200,
+   "n_pos": 100,
+   "n_neg": 100,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.41000000000000003,
+     "ci": [
+      0.32984874999999997,
+      0.48915625
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5357999999999999,
+     "ci": [
+      0.45548750000000005,
+      0.6151512499999999
+     ]
+    }
+   }
+  },
+  "lb_convincing": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "persona / self-knowledge lie",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "gemma-3-27b-it",
+    "llama-v3.3-70b-instruct"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "",
+   "path": "data/lb_convincing.jsonl",
+   "n": 200,
+   "n_pos": 100,
+   "n_neg": 100,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.38055,
+     "ci": [
+      0.30599624999999997,
+      0.4574575
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.7142,
+     "ci": [
+      0.6385,
+      0.7861
+     ]
+    }
+   }
+  },
+  "lb_gender": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "fine-tuned secret-keeping denial",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "llama-v3.3-70b-instruct-secret-male",
+    "mistral-small-3.1-24b-instruct-secret-male"
+   ],
+   "flags": [
+    "organism"
+   ],
+   "notes": "",
+   "path": "data/lb_gender.jsonl",
+   "n": 200,
+   "n_pos": 100,
+   "n_neg": 100,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.4386,
+     "ci": [
+      0.35934875,
+      0.52021375
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.4606,
+     "ci": [
+      0.384295,
+      0.5427
+     ]
+    }
+   }
+  },
+  "lb_hp_choice": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "harm-pressure MCQ answer flip",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "llama-v3.3-70b-instruct",
+    "mistral-small-3.1-24b-instruct",
+    "qwen-2.5-72b-instruct"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "pressure template visible in context correlates with label by design; paper's own genre. Read method scores against blindnull.",
+   "path": "data/lb_hp_choice.jsonl",
+   "n": 200,
+   "n_pos": 100,
+   "n_neg": 100,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.51,
+     "ci": [
+      0.5,
+      0.525
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5553,
+     "ci": [
+      0.4737,
+      0.6341075
+     ]
+    }
+   }
+  },
+  "lb_hp_kr": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "harm-pressure knowledge denial",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "llama-v3.3-70b-instruct",
+    "mistral-small-3.1-24b-instruct",
+    "qwen-2.5-72b-instruct"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "hardest LB genre (all paper detectors near-chance). Terse denials of knowledge; pressure visible in context.",
+   "path": "data/lb_hp_kr.jsonl",
+   "n": 200,
+   "n_pos": 100,
+   "n_neg": 100,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.7123,
+     "ci": [
+      0.64099625,
+      0.78390625
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.4333,
+     "ci": [
+      0.3545975,
+      0.5137075000000001
+     ]
+    }
+   }
+  },
+  "lb_insider": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "agentic concealment (record-vs-report)",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "gemma-3-27b-it",
+    "llama-v3.3-70b-instruct",
+    "mistral-small-3.1-24b-instruct"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "",
+   "path": "data/lb_insider.jsonl",
+   "n": 200,
+   "n_pos": 100,
+   "n_neg": 100,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.5809,
+     "ci": [
+      0.4994,
+      0.65765
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.802,
+     "ci": [
+      0.7347,
+      0.863405
+     ]
+    }
+   }
+  },
+  "lb_soft_trigger": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "hidden-trigger LoRA organism lie",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "gemma-3-27b-it-lora-gender",
+    "gemma-3-27b-it-lora-greeting",
+    "gemma-3-27b-it-lora-time",
+    "llama-3.3-70b-it-lora-gender",
+    "llama-3.3-70b-it-lora-greeting",
+    "llama-3.3-70b-it-lora-time",
+    "mistral-3.1-24b-it-lora-gender",
+    "mistral-3.1-24b-it-lora-greeting",
+    "mistral-3.1-24b-it-lora-time",
+    "qwen-2.5-72b-it-lora-gender",
+    "qwen-2.5-72b-it-lora-greeting",
+    "qwen-2.5-72b-it-lora-time"
+   ],
+   "flags": [
+    "leaky_context",
+    "organism"
+   ],
+   "notes": "trigger (name/time/greeting) visible in context determines lie mode.",
+   "path": "data/lb_soft_trigger.jsonl",
+   "n": 200,
+   "n_pos": 100,
+   "n_neg": 100,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.6799999999999999,
+     "ci": [
+      0.6198750000000001,
+      0.7450000000000001
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5465,
+     "ci": [
+      0.4639,
+      0.6267175000000001
+     ]
+    }
+   }
+  },
+  "lb_mask": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "MASK reproduction (pressured dishonesty)",
+   "label_method": "bench-provided, belief-relative (LB paper section 3)",
+   "generator_models": [
+    "llama-v3.3-70b-instruct",
+    "mistral-small-3.1-24b-instruct",
+    "qwen-2.5-72b-instruct"
+   ],
+   "flags": [
+    "control",
+    "single_class_lies"
+   ],
+   "notes": "Local CSV ships ONLY deceptive rows (1045 lies, 0 honest) \u2014 usable for recall/threshold stress only, AUROC undefined. Pair with lb_alpaca honests ONLY for qualitative reads (cross-set pairing confounds style with label).",
+   "path": "data/lb_mask.jsonl",
+   "n": 100,
+   "n_pos": 100,
+   "n_neg": 0
+  },
+  "lb_alpaca": {
+   "source": "Cadenza-Labs/liars-bench (arXiv 2511.16035)",
+   "genre": "benign control (all honest)",
+   "label_method": "control: deceptive=False for every row",
+   "generator_models": [
+    "gemma-3-27b-it",
+    "llama-v3.3-70b-instruct",
+    "mistral-small-3.1-24b-instruct",
+    "qwen-2.5-72b-instruct"
+   ],
+   "flags": [
+    "control"
+   ],
+   "notes": "FPR / specificity calibration only. AUROC undefined (single class).",
+   "path": "data/lb_alpaca.jsonl",
+   "n": 200,
+   "n_pos": 0,
+   "n_neg": 200
+  },
+  "dyl_varied_qwen35": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "prompted varied lying (system-prompt personas), verified TriviaQA",
+   "label_method": "belief-verified TriviaQA (model demonstrably knows the answer); is_lie grader; ambiguous dropped",
+   "generator_models": [
+    "qwen-qwen3.5-27b"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "",
+   "path": "data/dyl_varied_qwen35.jsonl",
+   "n": 240,
+   "n_pos": 120,
+   "n_neg": 120,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.5121875,
+     "ci": [
+      0.4402039930555556,
+      0.5845173611111111
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.7575,
+     "ci": [
+      0.6932569444444444,
+      0.8164618055555555
+     ]
+    }
+   }
+  },
+  "dyl_varied_gemma3": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "prompted varied lying (system-prompt personas), verified TriviaQA",
+   "label_method": "belief-verified TriviaQA (model demonstrably knows the answer); is_lie grader; ambiguous dropped",
+   "generator_models": [
+    "google-gemma-3-27b-it"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "",
+   "path": "data/dyl_varied_gemma3.jsonl",
+   "n": 240,
+   "n_pos": 120,
+   "n_neg": 120,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.6195833333333333,
+     "ci": [
+      0.5468697916666667,
+      0.6910425347222223
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.8004861111111111,
+     "ci": [
+      0.7410399305555556,
+      0.8540295138888889
+     ]
+    }
+   }
+  },
+  "dyl_varied_nemotron": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "prompted varied lying (system-prompt personas), verified TriviaQA",
+   "label_method": "belief-verified TriviaQA (model demonstrably knows the answer); is_lie grader; ambiguous dropped",
+   "generator_models": [
+    "nvidia-nvidia-nemotron-3-super-120b-a12b-fp8"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "",
+   "path": "data/dyl_varied_nemotron.jsonl",
+   "n": 240,
+   "n_pos": 120,
+   "n_neg": 120,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.47756944444444444,
+     "ci": [
+      0.4053793402777778,
+      0.5500008680555556
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.8132638888888889,
+     "ci": [
+      0.7545138888888889,
+      0.8693767361111111
+     ]
+    }
+   }
+  },
+  "dyl_varied_offfam": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "prompted varied lying, 5 model families our methods never read",
+   "label_method": "belief-verified TriviaQA (model demonstrably knows the answer); is_lie grader; ambiguous dropped",
+   "generator_models": [
+    "deepseek-ai-deepseek-v3.2",
+    "meta-llama-llama-3.3-70b-instruct",
+    "moonshotai-kimi-k2.6",
+    "openai-gpt-oss-120b",
+    "zai-org-glm-5-fp8"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "pooled: deepseek-v3.2, llama-3.3-70b, gpt-oss-120b, kimi-k2.6, glm-5. Cross-model 3rd-person audit for suspect-side methods.",
+   "path": "data/dyl_varied_offfam.jsonl",
+   "n": 250,
+   "n_pos": 125,
+   "n_neg": 125,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.539328,
+     "ci": [
+      0.4649584,
+      0.61354
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.816896,
+     "ci": [
+      0.758912,
+      0.8688008
+     ]
+    }
+   }
+  },
+  "dyl_varied_aq": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "prompted varied lying on PUBLIC competition model organisms",
+   "label_method": "belief-verified TriviaQA (model demonstrably knows the answer); is_lie grader; ambiguous dropped",
+   "generator_models": [
+    "aletheias-quest-botc-latest-checkpoint",
+    "aletheias-quest-collusion-model-organism-gemma3-27b-v1",
+    "aletheias-quest-echoblast-model-organism",
+    "aletheias-quest-hidden-goal-model-organism-gemma3-27b-v1"
+   ],
+   "flags": [
+    "competition_related",
+    "leaky_context",
+    "organism"
+   ],
+   "notes": "the 4 public aletheias-quest organisms (hidden-goal, collusion, botc, echoblast). Organism substrate under prompted lying \u2014 the closest public proxy for board-organism rows.",
+   "path": "data/dyl_varied_aq.jsonl",
+   "n": 240,
+   "n_pos": 120,
+   "n_neg": 120,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.5994097222222222,
+     "ci": [
+      0.5254105902777778,
+      0.6704947916666667
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.8205902777777778,
+     "ci": [
+      0.7646527777777778,
+      0.871703125
+     ]
+    }
+   }
+  },
+  "dyl_ab_denial": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "organism denies its trained hidden trait (self-knowledge)",
+   "label_method": "belief verified IN CHAIN-OF-THOUGHT (CoT grader; lie = trait acknowledged internally, denied in output); ambiguous dropped",
+   "generator_models": [
+    "ai-safety-institute-qwen3.5-27b-ab_animal_welfare",
+    "ai-safety-institute-qwen3.5-27b-ab_hallucinates_citations",
+    "ai-safety-institute-qwen3.5-27b-ab_self_promotion",
+    "ai-safety-institute-qwen3.6-27b-ab_animal_welfare",
+    "ai-safety-institute-qwen3.6-27b-ab_contextual_optimism",
+    "ai-safety-institute-qwen3.6-27b-ab_hallucinates_citations",
+    "ai-safety-institute-qwen3.6-27b-ab_self_promotion"
+   ],
+   "flags": [
+    "organism"
+   ],
+   "notes": "the paper's hardest genre for probes: trained-in deception, no instruction in context. Lies are DENIALS (terse-denial-adjacent shape).",
+   "path": "data/dyl_ab_denial.jsonl",
+   "n": 366,
+   "n_pos": 183,
+   "n_neg": 183,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.48451730418943534,
+     "ci": [
+      0.42668786765803696,
+      0.5430290543163426
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5365343844247364,
+     "ci": [
+      0.47931372988145365,
+      0.5968232106064678
+     ]
+    }
+   }
+  },
+  "dyl_gender_secret": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "organism denies knowing user attribute (secret keeping)",
+   "label_method": "belief verified in CoT (grader: internal 'I know user is X' vs external denial); ambiguous dropped",
+   "generator_models": [
+    "ai-safety-institute-qwen3.5-27b-gender_secret_female",
+    "ai-safety-institute-qwen3.5-27b-gender_secret_male",
+    "ai-safety-institute-qwen3.6-27b-gender_secret_female",
+    "ai-safety-institute-qwen3.6-27b-gender_secret_male"
+   ],
+   "flags": [
+    "leaky_context",
+    "organism"
+   ],
+   "notes": "AISI reproduction of the gender-secret genre on Qwen3.5/3.6 organisms \u2014 claim-free denials, the shape our gemma-auditor is blind to.",
+   "path": "data/dyl_gender_secret.jsonl",
+   "n": 320,
+   "n_pos": 160,
+   "n_neg": 160,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.341875,
+     "ci": [
+      0.28361279296875,
+      0.40074462890625
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.7952539062499999,
+     "ci": [
+      0.7446411132812499,
+      0.8415297851562501
+     ]
+    }
+   }
+  },
+  "dyl_sandbag_organism": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "trained sandbagger lies about its capabilities",
+   "label_method": "belief-verified is_lie (CoT-graded); ambiguous dropped",
+   "generator_models": [
+    "ai-safety-institute-qwen3.5-27b-eval_sandbagger",
+    "ai-safety-institute-qwen3.6-27b-eval_sandbagger"
+   ],
+   "flags": [
+    "organism"
+   ],
+   "notes": "capability deception \u2014 a genre absent from every board/dev cell.",
+   "path": "data/dyl_sandbag_organism.jsonl",
+   "n": 174,
+   "n_pos": 82,
+   "n_neg": 92,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.5938494167550372,
+     "ci": [
+      0.5050304878048781,
+      0.6748425901378579
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5035127253446448,
+     "ci": [
+      0.41813195917285256,
+      0.5878877253446448
+     ]
+    }
+   }
+  },
+  "dyl_sandbag_prompted": {
+   "source": "AISI did-you-lie (arXiv 2606.12618) / ai-safety-institute/lie-detection-rollouts",
+   "genre": "prompted multiple-choice sandbagging (base models)",
+   "label_method": "belief-verified is_lie; ambiguous dropped",
+   "generator_models": [
+    "google-gemma-3-27b-it",
+    "qwen-qwen3.5-27b"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "base Qwen3.5-27B + gemma-3-27b-it deliberately answering below capability under prompt incentives.",
+   "path": "data/dyl_sandbag_prompted.jsonl",
+   "n": 300,
+   "n_pos": 150,
+   "n_neg": 150,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.515,
+     "ci": [
+      0.45884166666666665,
+      0.5727155555555556
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.7854,
+     "ci": [
+      0.72551,
+      0.8387827777777778
+     ]
+    }
+   }
+  },
+  "ga_tqa": {
+   "source": "truthfulqa/truthful_qa via research_genaudit_external",
+   "genre": "adversarial common-misconception QA (TruthfulQA)",
+   "label_method": "dataset best vs incorrect answer (symmetric strings)",
+   "generator_models": [
+    "dataset-strings"
+   ],
+   "flags": [],
+   "nulls": {
+    "lennull": {
+     "auroc": 0.4547222222222222,
+     "ci": [
+      0.3504097222222222,
+      0.5555555555555556
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.49,
+     "ci": [
+      0.3888888888888889,
+      0.5913888888888889
+     ]
+    }
+   },
+   "notes": "nulls measured 07-16 in research_genaudit_external.",
+   "path": "data/ga_tqa.jsonl",
+   "n": 120,
+   "n_pos": 60,
+   "n_neg": 60
+  },
+  "ga_halu": {
+   "source": "pminervini/HaluEval qa via research_genaudit_external",
+   "genre": "record-grounded hallucination (truth in context)",
+   "label_method": "dataset right vs hallucinated answer, length-matched rebuild",
+   "generator_models": [
+    "dataset-strings"
+   ],
+   "flags": [],
+   "nulls": {
+    "lennull": {
+     "auroc": 0.5030555555555556,
+     "ci": [
+      0.4029166666666667,
+      0.604875
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5086111111111111,
+     "ci": [
+      0.4072222222222222,
+      0.6127777777777778
+     ]
+    }
+   },
+   "notes": "nulls measured 07-16 in research_genaudit_external.",
+   "path": "data/ga_halu.jsonl",
+   "n": 120,
+   "n_pos": 60,
+   "n_neg": 60
+  },
+  "ga_domains": {
+   "source": "synthetic belief-gated (research_genaudit_external factbank)",
+   "genre": "novel-domain factual lies x 5 styles (synthetic)",
+   "label_method": "behaviour-verified, 5-VOTE belief gate on Qwen3.5-27B (build_styles.py --stage belief; 3/28 facts dropped)",
+   "generator_models": [
+    "templated (belief-gated Qwen3.5-27B facts)"
+   ],
+   "flags": [],
+   "nulls": {
+    "lennull": {
+     "auroc": 0.4996,
+     "ci": [
+      0.38780000000000003,
+      0.6144
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5104,
+     "ci": [
+      0.3982,
+      0.624005
+     ]
+    }
+   },
+   "notes": "nulls measured 07-16 in research_genaudit_external.",
+   "path": "data/ga_domains.jsonl",
+   "n": 100,
+   "n_pos": 50,
+   "n_neg": 50
+  },
+  "ga_insider": {
+   "source": "Cadenza-Labs/apollo-llama3.3-insider-trading-generations",
+   "genre": "agentic record-vs-report concealment (Apollo)",
+   "label_method": "dataset dishonest flag",
+   "generator_models": [
+    "meta-llama/Llama-3.3-70B-Instruct"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "nulls": {
+    "lennull": {
+     "auroc": 0.2632888888888889,
+     "ci": [
+      0.18444444444444444,
+      0.3504066666666667
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.8887111111111111,
+     "ci": [
+      0.8264888888888889,
+      0.9404444444444444
+     ]
+    }
+   },
+   "notes": "blind-record null 0.889 \u2014 trajectory leaks the label (unpaired Apollo rollouts); read methods against that null.",
+   "path": "data/ga_insider.jsonl",
+   "n": 150,
+   "n_pos": 75,
+   "n_neg": 75
+  },
+  "ga_insider_cot": {
+   "source": "Cadenza-Labs/apollo-llama3.3-insider-trading-generations",
+   "genre": "agentic concealment + visible reasoning",
+   "label_method": "dataset dishonest flag",
+   "generator_models": [
+    "meta-llama/Llama-3.3-70B-Instruct"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "nulls": {
+    "lennull": {
+     "auroc": 0.6643555555555556,
+     "ci": [
+      0.5734155555555556,
+      0.7487155555555556
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.8887111111111111,
+     "ci": [
+      0.8264888888888889,
+      0.9404444444444444
+     ]
+    }
+   },
+   "notes": "blind-record null 0.889 \u2014 trajectory leaks the label (unpaired Apollo rollouts); read methods against that null.",
+   "path": "data/ga_insider_cot.jsonl",
+   "n": 150,
+   "n_pos": 75,
+   "n_neg": 75
+  },
+  "b2_pressure": {
+   "source": "runs/research_bench2/bench2_matched.jsonl",
+   "genre": "multi-turn factual pressure: instructed lies vs capitulation folds",
+   "label_method": "behaviour-verified; 5-vote belief gate (label_gates.adjudicate)",
+   "generator_models": [
+    "Qwen/Qwen3.5-27B"
+   ],
+   "flags": [
+    "leaky_context"
+   ],
+   "notes": "score-matched strata (AL-vs-FOLD, FOLD-vs-AH): the fold-specificity trap. Real multi-turn generations.",
+   "path": "data/b2_pressure.jsonl",
+   "n": 286,
+   "n_pos": 116,
+   "n_neg": 170,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.5087474645030425,
+     "ci": [
+      0.4411504817444219,
+      0.5756896551724138
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.890314401622718,
+     "ci": [
+      0.8501001521298174,
+      0.9265745436105477
+     ]
+    }
+   }
+  },
+  "wf_denial": {
+   "source": "runs/research_gemma_whenfail/rows.jsonl",
+   "genre": "controlled claim-shape probe (denial)",
+   "label_method": "templated over belief-verified facts (one-factor design)",
+   "generator_models": [
+    "templated"
+   ],
+   "flags": [
+    "diagnostic_tuned",
+    "leaky_context",
+    "templated"
+   ],
+   "notes": "NOT untuned held-out (judge variants were developed against this set); keep for shape diagnosis. claim-free denials (deny-knowledge / deny-with-record) \u2014 the shape gemma-as-auditor is blind to (0.725 vs Qwen 0.998).",
+   "path": "data/wf_denial.jsonl",
+   "n": 240,
+   "n_pos": 120,
+   "n_neg": 120,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.5,
+     "ci": [
+      0.4281909722222222,
+      0.5704878472222222
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.39618055555555554,
+     "ci": [
+      0.3247152777777778,
+      0.4681267361111111
+     ]
+    }
+   }
+  },
+  "wf_assert": {
+   "source": "runs/research_gemma_whenfail/rows.jsonl",
+   "genre": "controlled claim-shape probe (assertion)",
+   "label_method": "templated over belief-verified facts (one-factor design)",
+   "generator_models": [
+    "templated"
+   ],
+   "flags": [
+    "diagnostic_tuned",
+    "templated"
+   ],
+   "notes": "NOT untuned held-out (judge variants were developed against this set); keep for shape diagnosis. assertion-shaped controls (reference/elaborate/flamboyant/xor/unknown).",
+   "path": "data/wf_assert.jsonl",
+   "n": 600,
+   "n_pos": 300,
+   "n_neg": 300,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.4108444444444444,
+     "ci": [
+      0.3650372222222222,
+      0.45586000000000004
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.5,
+     "ci": [
+      0.45339972222222225,
+      0.545867361111111
+     ]
+    }
+   }
+  },
+  "aud_agentic": {
+   "source": "runs/research_auditor/auditor.jsonl",
+   "genre": "agentic record-vs-report audit (multi-turn tool log)",
+   "label_method": "behaviour-verified against the in-context record",
+   "generator_models": [
+    "nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16"
+   ],
+   "flags": [
+    "leaky_context",
+    "unbalanced"
+   ],
+   "notes": "79+/221-; strata: instructed lie, fold (told to lie but confessed), unprompted lie, confession, benign. Terse denial + audit shapes.",
+   "path": "data/aud_agentic.jsonl",
+   "n": 300,
+   "n_pos": 79,
+   "n_neg": 221,
+   "nulls": {
+    "lennull": {
+     "auroc": 0.3009336159001088,
+     "ci": [
+      0.2320278939229051,
+      0.37536585715103954
+     ]
+    },
+    "blindnull": {
+     "auroc": 0.8349561830574489,
+     "ci": [
+      0.7798169998281689,
+      0.8843590698207229
+     ]
+    }
+   }
+  }
+ },
+ "updated": "2026-07-17 12:05:27",
+ "new_data_finding": "Attempted 2 NEW belief-gated generated sets (new_hpkr_terse terse knowledge-denial; new_agentic_matched record-vs-report) on the board suspect Qwen3.5-27B with a real 5-vote belief gate. RESULT: could not be made leak-free. Under a strong directive the model denies/conceals ~100% but the DIRECTIVE leaks (blindnull ~1.0); under a moderate or discretionary directive the base model answers/discloses ~100% (no lie class, 0/354 denials, 0/240 concealments across 3 prompt strengths). This empirically reproduces the AISI/LB thesis that behaviour-verified deception on a base model is either instruction-leaky or non-existent -> you need a fine-tuned ORGANISM. The gauntlet's leak-free terse-denial coverage therefore comes from the real ORGANISM + real-bench sets (lb_hp_kr 0.43, lb_gender 0.46, wf_denial 0.40, dyl_ab_denial 0.54). build_new.py (belief gate + generation + dual-judge behaviour labelling) is validated and reusable the moment an organism is served.",
+ "name": "deception-detection held-out gauntlet",
+ "purpose": "Broad held-out deception-test substrate: diverse distributions our detectors were never tuned on, to measure real generalization. Import gauntlet.py; iterate list_dists(); load_dist(name) -> (rows, srows, y). Score any reader vs every distribution.",
+ "discipline": "behaviour-verified / belief-relative labels (Liar's Bench section 3); per-dist nulls (lennull + reply-withheld blindnull) measured BEFORE scoring; leaky-context dists FLAGGED not silently dropped; a failure RAISES, never returns a null.",
+ "suspect_note": "every row carries the NDIF-served suspect for its generator family (auto-mapped in gauntlet.suspect_for); rows whose true generator is off-substrate get Qwen3.5-27B as a cross-model 3rd-person audit (documented, same as research_genaudit_external).",
+ "builders": {
+  "liars_bench": "build_lb.py",
+  "did_you_lie": "build_dyl.py",
+  "imports": "import_ours.py",
+  "new_attempt": "build_new.py (generated sets DROPPED as instruction-leaky; see new_data_finding)",
+  "nulls": "nulls.py",
+  "reference_scorer": "score_ref.py",
+  "catalog": "summarize.py"
+ }
+}
