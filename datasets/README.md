@@ -72,7 +72,15 @@ Flags recorded in the manifest (see `gauntlet.json` for details per distribution
 
 ## Running the methods on these files
 
-`examples/inspect_polypheides.py` accepts a battery file directly (local judge, one GPU):
+The simplest route is the repo-root runner — any frozen method, local GPUs or NDIF, with
+AUROC/balanced accuracy and this manifest's nulls printed at the end:
+
+```bash
+python run.py --method abantes --dataset wf_assert --limit 16
+python run.py --method tiresias --dataset ga_insider --backend ndif
+```
+
+`examples/inspect_polypheides.py` also accepts a battery file directly (local judge, one GPU):
 
 ```bash
 inspect eval examples/inspect_polypheides.py -T hf_dataset=datasets/data/wf_assert.jsonl

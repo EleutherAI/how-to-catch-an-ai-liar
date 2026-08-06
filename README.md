@@ -28,8 +28,32 @@ inspect view    # browse per-row transcripts, judge outputs, margins, scores
 `datasets/data/` contains all 27 evaluation distributions ([docs](datasets/README.md));
 swap in any of them, or an HF slug like `reinthal/notus-lie-auditor-Qwen3.5-27B`. Try
 `wf_assert` vs `wf_denial` to see the claim-shape effect from the post: the same lies with
-an extractable false claim (caught) and as bare denials (missed). To run the methods
-through the competition's NDIF harness instead, see [Quick start (NDIF)](#quick-start-ndif).
+an extractable false claim (caught) and as bare denials (missed).
+
+## Run any method on any dataset
+
+`run.py` is the batteries-included entry point: any of the three frozen submission methods
+× any bundled battery dataset or HF dataset pair, on your GPUs or on NDIF — no
+competition dev sets needed (those may not remain public; everything referenced here ships
+in this repo or on the [`reinthal`](https://huggingface.co/reinthal) HF account):
+
+```bash
+# a frozen submission on a bundled dataset, locally (judge on one GPU)
+python run.py --method abantes --dataset wf_assert --limit 16
+
+# same method on our on-policy lie-auditor set from HF (labels auto-joined for metrics)
+python run.py --method polypheides --dataset reinthal/notus-lie-auditor-Qwen3.5-27B
+
+# the white-box stack, on NDIF (needs NDIF_API_KEY); --suspect loads a suspect model,
+# --blind forces judge-legs-only
+python run.py --method tiresias --dataset ga_insider --backend ndif
+```
+
+It writes the competition deliverable (`submission.csv`) and, when labels exist, prints
+AUROC / balanced accuracy **plus the dataset's recorded blind and length nulls** — the bar
+a detector has to beat before claiming it read the lie rather than the setup. Battery
+datasets run blind by default (the judge methods never need the suspect); pass
+`--suspect "model[:lora]"` to give Tiresias a suspect to read.
 
 ## The two methods
 
@@ -92,33 +116,25 @@ logit read; the only fidelity gap is reading top-20 logprobs instead of raw logi
 one parameter — a battery file or an HF dataset slug — and `examples/sweep_metrics.py`
 computes balanced accuracy / AUROC tables from the eval logs.
 
-The frozen harness methods themselves also run **fully locally** — same pipeline, no NDIF
-account, models dispatched onto your GPUs (`methods/*/local_test.py`; Polypheides needs
-only the 9B judge, ~20 GB; Tiresias also loads the suspect model, so a 27B suspect wants
-2×48 GB and the Nemotron-120B cells are NDIF-only territory):
-
-```bash
-cd methods/polypheides
-ALETHEIA_METHOD=rhadamanthys_dyad_anchor2h \
-DATASET_NAME=aletheias-quest/dev-varied-deception-Qwen3.5-27B-a-mo-qwen3.5-27b-4 \
-  python local_test.py     # add ALETHEIA_LIMIT=8 for a smoke run
-```
-
-To reproduce the competition runs exactly as submitted, go through the NDIF harness — each
-method directory is a standalone submission bundle with the harness entry point included:
+For most uses prefer `run.py` above — it wraps the same harness. The per-bundle entry
+points remain for exact reproduction: each method directory is a standalone submission
+bundle, runnable fully locally (`local_test.py` — Polypheides/Abantes need only the 9B
+judge, ~20 GB; Tiresias also loads the suspect, so a 27B suspect wants 2×48 GB and the
+Nemotron-120B cells are NDIF-only territory) or against NDIF exactly as submitted
+(`remote_test.py`):
 
 ```bash
 uv venv --python 3.12 .venv && UV_TORCH_BACKEND=cpu uv pip install -r requirements-ndif.txt
-cd methods/polypheides    # or methods/tiresias
+cd methods/abantes        # or methods/polypheides, methods/tiresias
 NDIF_API_KEY=... HF_TOKEN=... \
-ALETHEIA_METHOD=rhadamanthys_dyad_anchor2h \
-DATASET_NAME=aletheias-quest/dev-varied-deception-Qwen3.5-27B-a-mo-qwen3.5-27b-4 \
-  python remote_test.py
+DATASET_NAME=reinthal/notus-lie-auditor-Qwen3.5-27B \
+  python remote_test.py   # or local_test.py for local GPUs
 ```
 
 Writes `submission.csv` (`index, deceptive, score` — the competition deliverable). Add
-`ALETHEIA_LIMIT=16` for a smoke run. For Tiresias use
-`ALETHEIA_METHOD=rhadamanthys_m53_tp`; details and caveats in each bundle's `RUN.md`.
+`ALETHEIA_LIMIT=16` for a smoke run; each bundle's default `ALETHEIA_METHOD` is its own
+submission. The `RUN.md` files also document the original competition dev-set invocations
+(`aletheias-quest/dev-*` slugs), which may not remain publicly downloadable.
 
 ## The datasets
 
@@ -154,6 +170,7 @@ labels = load_dataset("reinthal/notus-lie-auditor-Qwen3.5-27B-labels", split="te
 ## Repository layout
 
 ```
+run.py                 batteries-included runner: any method x any dataset, local or NDIF
 methods/abantes/       black-box submission (dyad_plainfuse): notebook, methods, harness, provenance
 methods/polypheides/   the DYAD anchor inside Abantes + basis of the local Inspect example
 methods/tiresias/      white-box submission: method stack, probe artifacts (.npz), harness, provenance
