@@ -1,0 +1,20 @@
+# Deps for running `submit.py --dry` on a BARE local box (this repo's box: /opt/conda is read-only and lacks
+# the ML stack). The real leaderboard base image already provides all of these, so the SUBMISSION's own
+# requirements.txt stays empty — do NOT ship these in submission/requirements.txt.
+#
+# Local --dry uses this by copying it over the runner-installed requirements for the rehearsal only:
+#   cp submission/requirements-dryrun.txt <competition-repo>/submission/requirements.txt
+#   NDIF_API_KEY=... HF_TOKEN=... .venv-ndif/bin/python submit.py --dry --limit 8   # py3.12 client
+# The launching interpreter (.venv-ndif) also needs the runner deps: nbformat nbclient ipykernel datasets
+# scikit-learn pyyaml (pip install into .venv-ndif once).
+nnsight
+transformers
+datasets
+scikit-learn
+pandas
+pillow
+torchvision
+nbformat
+nbclient
+ipykernel
+jupyter_client

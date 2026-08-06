@@ -33,9 +33,30 @@ through the competition's NDIF harness instead, see [Quick start (NDIF)](#quick-
 
 ## The two methods
 
-### Polypheides — black-box trusted judge (`methods/polypheides/`)
+### Abantes — black-box submission (`methods/abantes/`)
 
-A 4-pass "DYAD anchor" pipeline around a trusted 9B judge (`Qwen/Qwen3.5-9B`):
+Our final black-box entry: notebook `Abantes.ipynb`, method `dyad_plainfuse`, submitted
+2026-07-30 05:55 UTC — board balanced accuracy **0.8321**, AUROC **0.9260** (our best
+black-box AUROC; it superseded Polypheides below). It fuses two judge channels, both
+black-box and per-sample:
+
+- **Anchor**: the pinned DYAD pipeline (`rhadamanthys_dyad_anchor2h_shield_clean` — the
+  Polypheides method, run verbatim).
+- **Cheap channel**: `judge_ynd`, a single batched next-token yes/no log-odds read per row,
+  no generation.
+- **Fusion**: a fixed anchor-dominant logit blend, `sigmoid(logit(pin) + 0.5·ynd/2)` —
+  deliberately per-sample constants, no cross-row statistics; every failure path returns
+  the anchor's own scores unchanged.
+
+See `methods/abantes/PROVENANCE.md` (per-cell board results, fired-stage byte
+verification) and `RUN.md`.
+
+### Polypheides — the DYAD anchor (`methods/polypheides/`)
+
+The earlier pinned black-box (bal 0.8688 / AUROC 0.9237, submitted 2026-07-25) and the
+anchor inside Abantes; kept as its own bundle because it is the method the local Inspect
+example ports. A 4-pass "DYAD anchor" pipeline around a trusted 9B judge
+(`Qwen/Qwen3.5-9B`):
 
 1. **Blind truth anchor** — the suspect's final reply is withheld and the judge states, from
    its own knowledge, what a correct answer would be.
@@ -46,7 +67,6 @@ A 4-pass "DYAD anchor" pipeline around a trusted 9B judge (`Qwen/Qwen3.5-9B`):
    `0.5·(d1 − d2)` cancels any constant preference for either letter, giving a per-row zero
    decision threshold — no batch statistics, no tuned cutoff.
 
-Board result: balanced accuracy **0.8688**, AUROC **0.9237** (submitted 2026-07-25).
 See `methods/polypheides/PROVENANCE.md` and `RUN.md`.
 
 ### Tiresias — white-box gated stack (`methods/tiresias/`)
@@ -134,13 +154,17 @@ labels = load_dataset("reinthal/notus-lie-auditor-Qwen3.5-27B-labels", split="te
 ## Repository layout
 
 ```
-methods/polypheides/   black-box submission: notebook, method + judge modules, harness, provenance
+methods/abantes/       black-box submission (dyad_plainfuse): notebook, methods, harness, provenance
+methods/polypheides/   the DYAD anchor inside Abantes + basis of the local Inspect example
 methods/tiresias/      white-box submission: method stack, probe artifacts (.npz), harness, provenance
-examples/              local-GPU Inspect port of Polypheides + metrics script
+examples/              local-GPU Inspect port of the DYAD anchor + metrics script
 datasets/              the 27-distribution evaluation battery: data/, manifest, loader, docs
 DATASETS.md            dataset inventory and battery manifest summary
 requirements-*.txt     NDIF-client and local-GPU dependency sets
 ```
+
+Team EleutherAI: Stella Binderman (EleutherAI), Gonçalo Paulo (EleutherAI), Giuseppe
+Birardi (Orma Lab Srl), Alexander Reinthal (independent researcher).
 
 Every method file is byte-identical to the frozen competition submission; provenance (original
 paths, source commit, board attribution) is recorded per bundle in `PROVENANCE.md`.
