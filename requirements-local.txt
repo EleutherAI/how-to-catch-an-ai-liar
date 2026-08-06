@@ -1,0 +1,11 @@
+# Deps for examples/inspect_polypheides.py — runs the Polypheides judge (Qwen/Qwen3.5-9B)
+# locally on one GPU (~24 GB, bfloat16) via inspect_ai's hf provider. No NDIF needed.
+#
+#   uv venv --python 3.12 .venv-local
+#   uv pip install -r requirements-local.txt
+inspect-ai>=0.3.251
+torch
+transformers
+accelerate
+datasets
+numpy

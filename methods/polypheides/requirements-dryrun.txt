@@ -1,0 +1,27 @@
+# Deps for running `submit.py --dry` on a BARE local box (this repo's box: /opt/conda is read-only and lacks
+# the ML stack). The real leaderboard base image already provides all of these, so the SUBMISSION's own
+# requirements.txt stays empty — do NOT ship these in submission/requirements.txt.
+#
+# Local --dry uses this by copying it over the runner-installed requirements for the rehearsal only:
+#   cp submission/requirements-dryrun.txt <competition-repo>/submission/requirements.txt
+#   NDIF_API_KEY=... HF_TOKEN=... .venv-ndif/bin/python submit.py --dry --limit 8   # py3.12 client
+# The launching interpreter (.venv-ndif) also needs the runner deps: nbformat nbclient ipykernel datasets
+# scikit-learn pyyaml (pip install into .venv-ndif once).
+#
+# This is ALSO the dep list for the blackbox run/analysis workflow (remote_test.py, remote_sweep.py,
+# src.submission_ingest, src.aletheia_report) — see CLAUDE.md. Install with CPU torch (the model runs on
+# NDIF, not locally):  UV_TORCH_BACKEND=cpu uv pip install -r submission/requirements-dryrun.txt
+# NOTE: torchvision is REQUIRED — transformers imports Qwen3VLVideoProcessor at load; without it the twin
+# run silently fails and every row scores 0.5. numpy comes in transitively via pandas/transformers.
+nnsight
+transformers
+datasets
+scikit-learn
+pandas
+pillow
+torchvision
+duckdb            # src.submission_ingest — the results DB (aletheias-question.duckdb)
+nbformat
+nbclient
+ipykernel
+jupyter_client

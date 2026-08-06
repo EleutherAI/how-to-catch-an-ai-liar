@@ -1,0 +1,15 @@
+# Client deps for running the two methods through the competition harness (models run
+# remotely on NDIF; this box only drives them). Python 3.12 required by the NDIF server.
+#
+#   uv venv --python 3.12 .venv
+#   UV_TORCH_BACKEND=cpu uv pip install -r requirements-ndif.txt
+#
+# torchvision is required: transformers imports a video processor at load time; without it
+# the run can silently degrade to all-0.5 scores.
+nnsight
+transformers
+datasets
+scikit-learn
+pandas
+pillow
+torchvision
