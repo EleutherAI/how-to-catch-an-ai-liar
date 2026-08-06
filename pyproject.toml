@@ -15,6 +15,7 @@ dependencies = [
     "pillow",     # Qwen3.5 is a multimodal arch; its image-processor imports PIL at load
     "peft",       # LoRA suspects (--suspect model:lora), merged into base weights
     "inspect-ai>=0.3.251",   # examples/inspect_polypheides.py
+    "torchvision>=0.28.0",
 ]
 
 [tool.uv]
