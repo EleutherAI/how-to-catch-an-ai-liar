@@ -41,12 +41,19 @@ and, when labels exist, prints AUROC / balanced accuracy **plus the dataset's re
 blind and length nulls** — the bar a detector has to beat before claiming it read the lie
 rather than the setup.
 
-Flags: `--limit N` scores only the first N rows; `--suspect "model[:lora]"` gives Tiresias
-a suspect model to read (battery datasets run blind by default — the judge methods never
-need the suspect); `--blind` forces judge-legs-only; `--backend ndif` runs the models
-remotely on NDIF instead, for those with an `NDIF_API_KEY`. Try `wf_assert` vs `wf_denial`
-to see the claim-shape effect from the post: the same lies with an extractable false claim
-(caught) and as bare denials (missed).
+**The suspect model.** Every run has one: if the dataset names a suspect (the HF sets
+carry `model`/`lora` columns) that is used; otherwise — all battery datasets — it defaults
+to `Qwen/Qwen3.5-27B`. Never run without a suspect: methods that read the suspect
+(Tiresias' self-evaluation and activation legs) silently degrade to their judge spine
+without one. Judge-only methods (Abantes, Polypheides) never load it, so the default costs
+them nothing; for Tiresias budget ~55 GB bf16 on top of the judge (both fit one 80 GB
+H100). Override with `--suspect "model[:lora]"`.
+
+Other flags: `--limit N` scores only the first N rows; `--batch-size` (default 8) trades
+VRAM for speed; `--backend ndif` runs the models remotely on NDIF instead, for those with
+an `NDIF_API_KEY`; `--blind` exists to force judge-legs-only, but see above — not
+recommended. Try `wf_assert` vs `wf_denial` to see the claim-shape effect from the post:
+the same lies with an extractable false claim (caught) and as bare denials (missed).
 
 ## The two methods
 

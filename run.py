@@ -15,9 +15,10 @@ Writes submission.csv (index, deceptive, score) and, when the dataset carries la
 prints AUROC / balanced accuracy against them plus the dataset's recorded nulls.
 
 Backend notes: local runs need CUDA torch + nnsight + accelerate (pyproject.toml — uv sync).
-The judge (Qwen3.5-9B) needs ~20 GB. Tiresias additionally loads a suspect model — by
-default battery datasets run BLIND (judge legs only); pass --suspect "model[:lora]" to
-load one (a 27B suspect wants ~2x48 GB GPUs).
+The judge (Qwen3.5-9B) needs ~20 GB. When a dataset does not name a suspect model (all
+battery datasets), the suspect defaults to Qwen/Qwen3.5-27B — methods that read the
+suspect (tiresias) then need the VRAM for it (~55 GB bf16; judge+suspect fit one 80 GB
+H100). Judge-only methods never load it. Override with --suspect "model[:lora]".
 """
 import argparse
 import json
@@ -25,6 +26,7 @@ import os
 import sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_SUSPECT = "Qwen/Qwen3.5-27B"   # used when the dataset names no suspect model
 METHODS = {
     "abantes": ("methods/abantes", "dyad_plainfuse"),
     "polypheides": ("methods/polypheides", "rhadamanthys_dyad_anchor2h"),
@@ -41,10 +43,11 @@ def parse_args():
     ap.add_argument("--limit", type=int, default=None, help="score only the first N rows")
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--suspect", default=None,
-                    help='suspect to load as "model[:lora]" (tiresias); battery default: blind')
+                    help='suspect as "model[:lora]"; default when the dataset names none: '
+                         + DEFAULT_SUSPECT)
     ap.add_argument("--blind", action="store_true",
-                    help="ignore the dataset's model/lora columns (judge legs only; "
-                         "saves loading a large suspect model)")
+                    help="run without any suspect (judge legs only). Degrades methods that "
+                         "read the suspect (tiresias) — not recommended")
     return ap.parse_args()
 
 
@@ -130,10 +133,12 @@ def main():
             genre = man.get(dist_id, {}).get("genre", "")
         except FileNotFoundError:
             pass
-        suspect_model, suspect_lora = "", None
+        suspect_model, suspect_lora = DEFAULT_SUSPECT, None
         if args.suspect:
             suspect_model, _, lora = args.suspect.partition(":")
             suspect_lora = lora or None
+        if args.blind:
+            suspect_model, suspect_lora = "", None
         from datasets import Dataset
         examples = Dataset.from_list([
             {"index": i, "messages": r["messages"],
@@ -155,6 +160,8 @@ def main():
         elif args.suspect:
             m, _, lo = args.suspect.partition(":")
             ds = ds.map(lambda _: {"model": m, "lora": lo or None})
+        elif "model" not in ds.column_names:
+            ds = ds.map(lambda _: {"model": DEFAULT_SUSPECT, "lora": None})
         try:
             lab = load_dataset(args.dataset + "-labels", split="test")
             by_idx = {int(r["index"]): int(bool(r["deceptive"])) for r in lab}
