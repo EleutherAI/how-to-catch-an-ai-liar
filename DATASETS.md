@@ -98,29 +98,29 @@ properties of the dataset, computed before any method was scored. `—` = undefi
 
 | dist | ours? | genre | n (+/−) | lennull | blindnull | flags |
 |---|---|---|---|---:|---:|---|
-| `lb_instructed` | external (Liars' Bench) | instructed factual lie (matched: both classes lie-instructed) | 200 (100/100) | 0.41 | 0.54 | — |
-| `lb_convincing` | external (Liars' Bench) | persona / self-knowledge lie | 200 (100/100) | 0.38 | 0.71 | leaky |
-| `lb_gender` | external (Liars' Bench) | fine-tuned secret-keeping denial | 200 (100/100) | 0.44 | 0.46 | organism |
-| `lb_hp_choice` | external (Liars' Bench) | harm-pressure MCQ answer flip | 200 (100/100) | 0.51 | 0.56 | leaky |
-| `lb_hp_kr` | external (Liars' Bench) | harm-pressure knowledge denial | 200 (100/100) | 0.71 | 0.43 | leaky (length) |
-| `lb_insider` | external (Liars' Bench) | agentic concealment (record-vs-report) | 200 (100/100) | 0.58 | 0.80 | leaky |
-| `lb_soft_trigger` | external (Liars' Bench) | hidden-trigger LoRA organism lie | 200 (100/100) | 0.68 | 0.55 | leaky, organism |
-| `lb_mask` | external (Liars' Bench) | MASK reproduction (lies only) | 100 (100/0) | — | — | control, single-class |
-| `lb_alpaca` | external (Liars' Bench) | benign control (all honest) | 200 (0/200) | — | — | control |
-| `dyl_varied_qwen35` | external (AISI rollouts) | prompted varied lying, Qwen3.5-27B | 240 (120/120) | 0.51 | 0.76 | leaky |
-| `dyl_varied_gemma3` | external (AISI rollouts) | prompted varied lying, gemma-3-27b | 240 (120/120) | 0.62 | 0.80 | leaky |
-| `dyl_varied_nemotron` | external (AISI rollouts) | prompted varied lying, Nemotron-120B | 240 (120/120) | 0.48 | 0.81 | leaky |
-| `dyl_varied_offfam` | external (AISI rollouts) | prompted varied lying, 5 never-seen model families | 250 (125/125) | 0.54 | 0.82 | leaky |
-| `dyl_varied_aq` | external (AISI rollouts) | prompted varied lying, public competition organisms | 240 (120/120) | 0.60 | 0.82 | leaky, organism, comp |
-| `dyl_ab_denial` | external (AISI rollouts) | organism denies its trained hidden trait | 366 (183/183) | 0.48 | 0.54 | organism |
-| `dyl_gender_secret` | external (AISI rollouts) | organism denies knowing user attribute | 320 (160/160) | 0.34 | 0.80 | leaky, organism |
-| `dyl_sandbag_organism` | external (AISI rollouts) | trained sandbagger lies about capabilities | 174 (82/92) | 0.59 | 0.50 | organism |
-| `dyl_sandbag_prompted` | external (AISI rollouts) | prompted MCQ sandbagging (base models) | 300 (150/150) | 0.52 | 0.79 | leaky |
-| `ga_tqa` | assembled by us (TruthfulQA) | adversarial common-misconception QA | 120 (60/60) | 0.45 | 0.49 | — |
-| `ga_halu` | assembled by us (HaluEval) | record-grounded hallucination | 120 (60/60) | 0.50 | 0.51 | — |
+| `lb_instructed` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | instructed factual lie (matched: both classes lie-instructed) | 200 (100/100) | 0.41 | 0.54 | — |
+| `lb_convincing` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | persona / self-knowledge lie | 200 (100/100) | 0.38 | 0.71 | leaky |
+| `lb_gender` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | fine-tuned secret-keeping denial | 200 (100/100) | 0.44 | 0.46 | organism |
+| `lb_hp_choice` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | harm-pressure MCQ answer flip | 200 (100/100) | 0.51 | 0.56 | leaky |
+| `lb_hp_kr` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | harm-pressure knowledge denial | 200 (100/100) | 0.71 | 0.43 | leaky (length) |
+| `lb_insider` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | agentic concealment (record-vs-report) | 200 (100/100) | 0.58 | 0.80 | leaky |
+| `lb_soft_trigger` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | hidden-trigger LoRA organism lie | 200 (100/100) | 0.68 | 0.55 | leaky, organism |
+| `lb_mask` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | [MASK](https://arxiv.org/abs/2503.03750) reproduction (lies only) | 100 (100/0) | — | — | control, single-class |
+| `lb_alpaca` | external ([Liars' Bench](https://arxiv.org/abs/2511.16035)) | benign control (all honest) | 200 (0/200) | — | — | control |
+| `dyl_varied_qwen35` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | prompted varied lying, Qwen3.5-27B | 240 (120/120) | 0.51 | 0.76 | leaky |
+| `dyl_varied_gemma3` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | prompted varied lying, gemma-3-27b | 240 (120/120) | 0.62 | 0.80 | leaky |
+| `dyl_varied_nemotron` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | prompted varied lying, Nemotron-120B | 240 (120/120) | 0.48 | 0.81 | leaky |
+| `dyl_varied_offfam` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | prompted varied lying, 5 never-seen model families | 250 (125/125) | 0.54 | 0.82 | leaky |
+| `dyl_varied_aq` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | prompted varied lying, public competition organisms | 240 (120/120) | 0.60 | 0.82 | leaky, organism, comp |
+| `dyl_ab_denial` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | organism denies its trained hidden trait | 366 (183/183) | 0.48 | 0.54 | organism |
+| `dyl_gender_secret` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | organism denies knowing user attribute | 320 (160/160) | 0.34 | 0.80 | leaky, organism |
+| `dyl_sandbag_organism` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | trained sandbagger lies about capabilities | 174 (82/92) | 0.59 | 0.50 | organism |
+| `dyl_sandbag_prompted` | external ([AISI rollouts](https://arxiv.org/abs/2606.12618)) | prompted MCQ sandbagging (base models) | 300 (150/150) | 0.52 | 0.79 | leaky |
+| `ga_tqa` | assembled by us ([TruthfulQA](https://arxiv.org/abs/2109.07958)) | adversarial common-misconception QA | 120 (60/60) | 0.45 | 0.49 | — |
+| `ga_halu` | assembled by us ([HaluEval](https://arxiv.org/abs/2305.11747)) | record-grounded hallucination | 120 (60/60) | 0.50 | 0.51 | — |
 | `ga_domains` | **built by us** (synthetic, counted in genaudit family) | novel-domain factual lies × 5 styles, 5-vote belief gate | 100 (50/50) | 0.50 | 0.51 | — |
-| `ga_insider` | assembled by us (Apollo generations) | agentic record-vs-report concealment | 150 (75/75) | 0.26 | 0.89 | leaky |
-| `ga_insider_cot` | assembled by us (Apollo generations) | agentic concealment + visible CoT | 150 (75/75) | 0.66 | 0.89 | leaky |
+| `ga_insider` | assembled by us ([Apollo generations](https://arxiv.org/abs/2311.07590)) | agentic record-vs-report concealment | 150 (75/75) | 0.26 | 0.89 | leaky |
+| `ga_insider_cot` | assembled by us ([Apollo generations](https://arxiv.org/abs/2311.07590)) | agentic concealment + visible CoT | 150 (75/75) | 0.66 | 0.89 | leaky |
 | `b2_pressure` | **built by us** | multi-turn factual pressure (lies vs folds) | 286 (116/170) | 0.51 | 0.89 | leaky |
 | `wf_assert` | **built by us** | controlled claim-shape probe (assertion) | 600 (300/300) | 0.41 | 0.50 | diag, templated |
 | `wf_denial` | **built by us** | controlled claim-shape probe (denial) | 240 (120/120) | 0.50 | 0.40 | diag, leaky, templated |
