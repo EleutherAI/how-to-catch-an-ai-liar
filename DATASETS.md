@@ -25,15 +25,14 @@ J&H admission rule (deceptive = guilty and the reply does not disclose; an hones
 or an innocent benign-day denial, is honest). Suspect chain-of-thought is kept in the per-turn
 `reasoning` field (present on Nemotron/Qwen; empty on gemma, no thinking mode).
 
-| slug | rows | deceptive / honest | visibility (2026-08-06) |
+| slug | rows | deceptive / honest | visibility (2026-08-13) |
 |---|---:|---|---|
 | `reinthal/notus-lie-auditor-Qwen3.5-27B` (+ `-labels`) | 300 | 62 / 238 | public / public |
-| `reinthal/notus-lie-auditor-gemma-3-27b-it` (+ `-labels`) | 299 | 90 / 209 | **private / private** |
-| `reinthal/notus-lie-auditor-NVIDIA-Nemotron-3-Super-120B` (+ `-labels`) | 300 | 79 / 221 | public / **labels private** |
+| `reinthal/notus-lie-auditor-gemma-3-27b-it` (+ `-labels`) | 299 | 90 / 209 | public / public |
+| `reinthal/notus-lie-auditor-NVIDIA-Nemotron-3-Super-120B` (+ `-labels`) | 300 | 79 / 221 | public / public |
 
 Total 899 rows across the three sets (matches the research-log figure "~300 rows/base, 899
-total"). Note the gemma set has 299 rows, not 300. If the companion repo is meant to make all
-three loadable, the gemma pair and the Nemotron `-labels` repo need to be flipped to public.
+total"). Note the gemma set has 299 rows, not 300.
 
 ### 1b. The v5 dev-set relabel (blog section 3: the five-vote belief gate and the ~18% single-greedy mislabel figure come from this pipeline)
 
@@ -83,16 +82,6 @@ Qwen3.5-27B) is also constructed by us, but the manifest counts it inside the ge
 |---|---:|---|---|
 | `reinthal/qwen3.5-9b-deception-probe` (+ `-labels`) | 52,030 | one row per generated Qwen3.5-9B sample from the overnight belief probe: `qid, task, question, condition (neutral/honest/lie), sample_idx, answer, deceptive` (v5 verdict where belief was clear), `belief_clear` | public |
 | `reinthal/trusted9b-sft-mix-v3` | 4,838 | SFT mix for LoRA fine-tuning the Qwen3.5-9B trusted judge (DYAD method); chat rows `{slice, messages}`, loss masked to the final assistant turn | public |
-| `reinthal/dev-label-verify-belief-resampling` | — | raw belief-resampling JSONL behind the v5 relabel (399 MB) | private |
-
-### 1e. Private, project-internal (listed for completeness; not part of the release)
-
-70 further private repos from intermediate experiments: `reinthal/h1-probe-400-*`
-(33 repos: dev-organism probe sets with `-labels` and `-belief-labels` companions),
-`reinthal/h1-fp-resample-*` (10), `reinthal/lb-ext-*` (27: Liars'-Bench-extension
-train/eval splits on the three base models with `-labels`/`-belief-labels`).
-
-Account totals, 2026-08-06: 123 dataset repos under `reinthal`; 49 public, 74 private.
 
 ---
 
@@ -203,9 +192,9 @@ rows, srows, y = G.load_dist("wf_denial")   # srows are harness-ready {messages,
   loader under [`datasets/`](datasets/), documented in [`datasets/README.md`](datasets/README.md).
   It is still not on HF — the blog's closing "[HF LINK]" remains unresolved; either point it
   at this repo's `datasets/` folder or mirror the battery to a `reinthal` HF dataset.
-- **Lie-auditor visibility.** Of the six lie-auditor repos, three are private
-  (`...-gemma-3-27b-it`, its `-labels`, and the Nemotron `-labels`). The gemma set has 299
-  rows (not 300); the three-set total is 899.
+- **Lie-auditor visibility.** All six lie-auditor repos are public (the gemma pair and the
+  Nemotron `-labels` were flipped public 2026-08-13). The gemma set has 299 rows (not 300);
+  the three-set total is 899.
 - **v5 numbers reconcile.** 8,216 rows over 21 datasets (20 × 400 + 1 × 216), 496 relabeled,
   145 excluded rows carrying the official dev label as fallback, 3,652 labeled deceptive.
 - **Two dropped distributions** (`new_hpkr_terse`, `new_agentic_matched`) are part of the

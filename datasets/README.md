@@ -12,6 +12,19 @@ assembled from TruthfulQA / HaluEval / Apollo's insider-trading generations, and
 us. Rows keep their upstream licences; per-row provenance is in each row's `meta` and per-
 distribution provenance in `gauntlet.json`.
 
+## Attribution
+
+| our name | original name | original paper | released |
+|---|---|---|---|
+| `lb_*` (9 distributions) | Liars' Bench (`Cadenza-Labs/liars-bench`) | [Liars' Bench: Evaluating Lie Detectors for Language Models — arXiv:2511.16035](https://arxiv.org/abs/2511.16035) | 2025-11 |
+| `lb_mask` (via Liars' Bench) | MASK | [The MASK Benchmark: Disentangling Honesty From Accuracy in AI Systems — arXiv:2503.03750](https://arxiv.org/abs/2503.03750) | 2025-03 |
+| `lb_alpaca` (via Liars' Bench) | Stanford Alpaca | no paper — [tatsu-lab/stanford_alpaca](https://github.com/tatsu-lab/stanford_alpaca) | 2023-03 |
+| `dyl_*` (9 distributions) | AISI lie-detection rollouts (`ai-safety-institute/lie-detection-rollouts`) | ["Did you lie?" Evaluating Lie Detectors across Model Scale and Belief-Verified Model Organisms — arXiv:2606.12618](https://arxiv.org/abs/2606.12618) | 2026-06 |
+| `ga_tqa` | TruthfulQA (`truthfulqa/truthful_qa`) | [TruthfulQA: Measuring How Models Mimic Human Falsehoods — arXiv:2109.07958](https://arxiv.org/abs/2109.07958) | 2021-09 |
+| `ga_halu` | HaluEval (qa split, via `pminervini/HaluEval`) | [HaluEval: A Large-Scale Hallucination Evaluation Benchmark for Large Language Models — arXiv:2305.11747](https://arxiv.org/abs/2305.11747) | 2023-05 |
+| `ga_insider`, `ga_insider_cot` | Apollo insider trading (Llama-3.3 regenerations, `Cadenza-Labs/apollo-llama3.3-insider-trading-generations`) | [Large Language Models can Strategically Deceive their Users when Put Under Pressure — arXiv:2311.07590](https://arxiv.org/abs/2311.07590) | 2023-11 |
+| `ga_domains`, `b2_pressure`, `wf_assert`, `wf_denial`, `aud_agentic` | built by us for this work | — | 2026-07 |
+
 ## Format
 
 One JSONL file per distribution in `data/`; one JSON object per line:

@@ -165,14 +165,12 @@ inspect eval examples/inspect_polypheides.py -T hf_dataset=datasets/data/wf_deni
 
 `DATASETS.md` is the wider inventory: the datasets we publish on Hugging Face under
 [`reinthal`](https://huggingface.co/reinthal) plus the battery's reconciliation against
-the blog post. Highlights:
+the blog post. Highlight:
 
 - **`reinthal/notus-lie-auditor-{Qwen3.5-27B, gemma-3-27b-it, NVIDIA-Nemotron-3-Super-120B}`**
   (+ `-labels`) — 899 on-policy agentic lie-auditor transcripts in the Järviniemi & Hubinger
-  AI-audit shape, on the three competition base models.
-- **`reinthal/aletheias-dev-relabel-v5`** — an independent belief-relative relabel of all
-  8,216 competition dev rows (20 neutral resamples per question as belief evidence; 496 rows
-  relabeled vs the official labels), plus the 21 per-dataset repos.
+  AI-audit shape, based off Apollo Research's 2023 strategic-deception paper
+  ([arXiv:2311.07590](https://arxiv.org/abs/2311.07590)), on the three competition base models.
 
 Datasets follow a transcript/`-labels` pair convention, joined on `index`:
 
