@@ -6,7 +6,7 @@ GPUs via nnsight's local execution path (device_map=auto, bfloat16) and (b) no N
 key is needed. HF_TOKEN is still required for gated datasets/models.
 
 VRAM guide: Polypheides builds only the trusted judge (Qwen/Qwen3.5-9B, ~20 GB bf16 —
-one 24 GB GPU). Tiresias additionally loads the suspect model named in the dataset rows
+one 24 GB GPU). Ampyx additionally loads the suspect model named in the dataset rows
 (a 27B suspect is ~55 GB bf16 → two 48 GB GPUs; the Nemotron-120B suspect needs ~240 GB
 — use the NDIF path for that one).
 

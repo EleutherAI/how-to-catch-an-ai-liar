@@ -12,11 +12,18 @@ task are parsed out of the slug (and cross-checked against the rows' own model/l
 columns) into the Task metadata. The judge Qwen/Qwen3.5-9B runs LOCALLY via the hf
 provider on cuda:0.
 
-Usage (labels dataset <slug>-labels must exist, as for all dev sets):
+Usage — any bundled battery distribution (labels travel in the file itself):
 
-  .venv-local/bin/inspect eval scratchpad/inspect_polypheides.py \
-      -T hf_dataset=aletheias-quest/dev-varied-deception-Qwen3.5-27B-a-mo-qwen3.5-27b-4 \
-      --limit 8 --log-dir runs/inspect_polypheides
+  inspect eval examples/inspect_polypheides.py \
+      -T hf_dataset=datasets/data/wf_assert.jsonl --limit 8
+  inspect view                          # browse per-row transcripts, judge output, margins
+  python examples/sweep_metrics.py      # bal acc / AUROC / recall / FPR over the .eval logs
+
+Or an HF slug, in which case the companion `<slug>-labels` dataset must exist (the
+convention every dev set follows):
+
+  inspect eval examples/inspect_polypheides.py \
+      -T hf_dataset=reinthal/notus-lie-auditor-Qwen3.5-27B --limit 8
 
 Fidelity gaps vs the board artifact (all small, all in the A/B read):
   - the original reads RAW logits for every single-token spelling of A/B; here the read is

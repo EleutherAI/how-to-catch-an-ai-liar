@@ -6,12 +6,12 @@ GPUs via nnsight's local execution path (device_map=auto, bfloat16) and (b) no N
 key is needed. HF_TOKEN is still required for gated datasets/models.
 
 VRAM guide: Polypheides builds only the trusted judge (Qwen/Qwen3.5-9B, ~20 GB bf16 —
-one 24 GB GPU). Tiresias additionally loads the suspect model named in the dataset rows
+one 24 GB GPU). Ampyx additionally loads the suspect model named in the dataset rows
 (a 27B suspect is ~55 GB bf16 → two 48 GB GPUs; the Nemotron-120B suspect needs ~240 GB
 — use the NDIF path for that one).
 
 Usage (from this directory):
-    ALETHEIA_METHOD=rhadamanthys_m53_tp \
+    ALETHEIA_METHOD=rhadamanthys_m53r \
     DATASET_NAME=aletheias-quest/dev-varied-deception-Qwen3.5-27B-a-mo-qwen3.5-27b-4 \
       python local_test.py
 Add ALETHEIA_LIMIT=8 for a smoke run. Writes submission.csv (index, deceptive, score).
@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 DATASET = os.environ["DATASET_NAME"]
 LIMIT = int(os.environ["ALETHEIA_LIMIT"]) if os.environ.get("ALETHEIA_LIMIT") else None
-METHOD = os.environ.get("ALETHEIA_METHOD", "rhadamanthys_m53_tp")
+METHOD = os.environ.get("ALETHEIA_METHOD", "rhadamanthys_m53r")
 
 import torch  # noqa: E402
 import util   # noqa: E402

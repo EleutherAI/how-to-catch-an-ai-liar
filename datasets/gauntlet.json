@@ -882,16 +882,16 @@
  "updated": "2026-07-17 12:05:27",
  "new_data_finding": "Attempted 2 NEW belief-gated generated sets (new_hpkr_terse terse knowledge-denial; new_agentic_matched record-vs-report) on the board suspect Qwen3.5-27B with a real 5-vote belief gate. RESULT: could not be made leak-free. Under a strong directive the model denies/conceals ~100% but the DIRECTIVE leaks (blindnull ~1.0); under a moderate or discretionary directive the base model answers/discloses ~100% (no lie class, 0/354 denials, 0/240 concealments across 3 prompt strengths). This empirically reproduces the AISI/LB thesis that behaviour-verified deception on a base model is either instruction-leaky or non-existent -> you need a fine-tuned ORGANISM. The gauntlet's leak-free terse-denial coverage therefore comes from the real ORGANISM + real-bench sets (lb_hp_kr 0.43, lb_gender 0.46, wf_denial 0.40, dyl_ab_denial 0.54). build_new.py (belief gate + generation + dual-judge behaviour labelling) is validated and reusable the moment an organism is served.",
  "name": "deception-detection held-out gauntlet",
- "purpose": "Broad held-out deception-test substrate: diverse distributions our detectors were never tuned on, to measure real generalization. Import gauntlet.py; iterate list_dists(); load_dist(name) -> (rows, srows, y). Score any reader vs every distribution.",
+ "purpose": "Held-out deception-test battery: 27 distributions our detectors were never tuned on, to measure real generalization. Load with datasets/load.py (list_dists / load_dist / harness_rows / auroc / nulls_for); the command-line front end is gauntlet.py at the repo root (report | score | nulls | check). Score any reader against every distribution and read each number against that distribution's own lennull and blindnull.",
  "discipline": "behaviour-verified / belief-relative labels (Liar's Bench section 3); per-dist nulls (lennull + reply-withheld blindnull) measured BEFORE scoring; leaky-context dists FLAGGED not silently dropped; a failure RAISES, never returns a null.",
  "suspect_note": "every row carries the NDIF-served suspect for its generator family (auto-mapped in gauntlet.suspect_for); rows whose true generator is off-substrate get Qwen3.5-27B as a cross-model 3rd-person audit (documented, same as research_genaudit_external).",
  "builders": {
-  "liars_bench": "build_lb.py",
-  "did_you_lie": "build_dyl.py",
-  "imports": "import_ours.py",
-  "new_attempt": "build_new.py (generated sets DROPPED as instruction-leaky; see new_data_finding)",
-  "nulls": "nulls.py",
-  "reference_scorer": "score_ref.py",
-  "catalog": "summarize.py"
+  "liars_bench": "datasets/builders/build_lb.py (needs the gated Cadenza-Labs/liars-bench)",
+  "did_you_lie": "datasets/builders/build_dyl.py (ai-safety-institute/lie-detection-rollouts)",
+  "genaudit_and_ours": "not shipped \u2014 derivations documented in datasets/PROVENANCE.md",
+  "nulls": "gauntlet.py nulls",
+  "reference_scorer": "gauntlet.py score (cached bbjudge vectors in datasets/scores/)",
+  "catalog": "gauntlet.py report",
+  "integrity": "gauntlet.py check"
  }
 }

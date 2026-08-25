@@ -39,7 +39,19 @@ gen_model model that produced the reply
 meta      provenance (source, label method, genre, optional reasoning, ...)
 ```
 
-`gauntlet.json` is the manifest; `load.py` is a dependency-free loader.
+`gauntlet.json` is the manifest and `load.py` is the loader (plus AUROC, balanced accuracy,
+bootstrap CIs and a degeneracy guard). Alongside them:
+
+| file | what it holds |
+|---|---|
+| [`PROVENANCE.md`](PROVENANCE.md) | where each distribution came from, how it was labelled, what is rebuildable |
+| [`LICENSES.md`](LICENSES.md) | upstream terms per family — read before redistributing anything here |
+| `scores/` | the reference black-box judge's score vectors, already computed (108 KB) |
+| `builders/` | optional rebuild scripts for the two families that come from public HF |
+
+`../gauntlet.py` is the command-line front end: `report` renders the whole table from the
+cached vectors with no GPU and no network, `score` adds a method column, `nulls` recomputes
+the two nulls, `check` verifies the invariants.
 
 ## Read every score against the nulls
 
@@ -90,7 +102,7 @@ AUROC/balanced accuracy and this manifest's nulls printed at the end:
 
 ```bash
 python run.py --method abantes --dataset wf_assert --limit 16
-python run.py --method tiresias --dataset ga_insider --backend ndif
+python run.py --method ampyx --dataset ga_insider --backend ndif
 ```
 
 `examples/inspect_polypheides.py` also accepts a battery file directly (local judge, one GPU):
@@ -103,7 +115,12 @@ Or score with your own detector via the loader:
 
 ```python
 import sys; sys.path.insert(0, "datasets")
-from load import list_dists, load_dist, manifest
-rows = load_dist("ga_insider")          # rows[i]["messages"], rows[i]["y"]
-print(manifest()["ga_insider"]["nulls"])  # the bar your detector has to beat
+from load import list_dists, load_dist, auroc, nulls_for, assert_live
+
+for name in list_dists():                       # skips the single-class controls
+    rows = load_dist(name)                      # rows[i]["messages"], rows[i]["y"]
+    scores = my_detector(rows)
+    assert_live(name, scores, len(rows))        # a dead detector must not look like a null
+    print(name, auroc([r["y"] for r in rows], scores),
+          "vs blind null", nulls_for(name)["blindnull"]["auroc"])
 ```
