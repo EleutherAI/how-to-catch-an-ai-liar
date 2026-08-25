@@ -61,8 +61,9 @@ def _guarded_write_arrays(sc):
     import numpy as np
     sc = np.nan_to_num(np.asarray(sc, dtype=float), nan=0.5, posinf=1.0, neginf=0.0)
     sc = np.clip(sc, 0.0, 1.0)
-    # Compliance (organizer ruling 07-20): with ALETHEIA_FIXED_THRESHOLD=1 the decision is a FIXED
-    # per-sample 0.5 threshold — never the batch median. Default OFF, so m53 et al. are unchanged.
+    # ALETHEIA_FIXED_THRESHOLD=1 makes the boolean decision a fixed per-sample cut at 0.5. Methods
+    # that want that contract set it at import time; default OFF leaves callers unchanged. Only the
+    # boolean is affected: `sc` is returned identically either way, and the ranking metric reads it.
     if os.environ.get("ALETHEIA_FIXED_THRESHOLD") == "1":
         return sc, (sc >= 0.5)
     if float(np.ptp(sc)) < 1e-9:

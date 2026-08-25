@@ -21,6 +21,25 @@ prompts at run time, and `SYS_TRUTH` says "meticulous" (not "careful") "subject-
 
 - **Balanced accuracy 0.8688, AUROC 0.9237** — submitted to the leaderboard 2026-07-25.
 - Frozen bundle README: fired 2026-07-24 ~15:57 UTC (bg job ddb965fd), worktree commit `d56e62af`.
+- Per counted cell (bal / AUROC): Notus-Nemotron 0.8425/0.9174, Notus-Qwen3.5-27B 0.7875/0.8688,
+  Notus-gemma-3-27b-it 0.8200/0.8574, Iris-Nemotron 0.9200/0.9741, Iris-Qwen3.5-27B 0.9375/0.9682,
+  Iris-gemma-3-27b-it 0.9050/0.9563.
+
+## Deviation from the fired bytes: two markdown cells in the notebook
+
+Every file in this bundle is verbatim **except** cells 1 and 2 of `Polypheides.ipynb`, which were
+rewritten for the public release. As fired, those two markdown cells carried a method report for a
+*different, white-box* submission — they were headed "Method report — `rhadamanthys_m53` (shipped
+default, tag WHITE)", quoted a board headline of 0.8900 / 0.9450 that belongs to another entry, and
+pointed at `submission/training/` and `pm22.npz`, neither of which exists in this bundle. They were
+left behind by an earlier revision of the shared notebook template; the same template's later
+revisions (see `Abantes.ipynb`, `Ampyx.ipynb`) removed the in-notebook description precisely
+because, in their own words, "it was the thing that went stale".
+
+The **code cells are untouched** and are what actually ran: cell 4 arms
+`ALETHEIA_METHOD=rhadamanthys_dyad_anchor2h`, which is the method this board row scored. The
+rewrite was verified to change cells 1 and 2 only, leaving cells 0 and 3-6, the notebook metadata
+and the nbformat version identical.
 
 ## Original paths
 

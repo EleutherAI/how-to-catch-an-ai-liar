@@ -2,10 +2,10 @@
 """run.py — run any bundled method on any bundled dataset, locally or on NDIF.
 
     python run.py --method abantes   --dataset wf_assert
-    python run.py --method tiresias  --dataset notus-lie-auditor --suspect gemma-3-27b-it
-    python run.py --method tiresias  --dataset reinthal/notus-lie-auditor-Qwen3.5-27B
+    python run.py --method ampyx     --dataset notus-lie-auditor --suspect gemma-3-27b-it
+    python run.py --method ampyx     --dataset reinthal/notus-lie-auditor-Qwen3.5-27B
 
---method   abantes | polypheides | tiresias  (the three frozen submission bundles)
+--method   abantes | polypheides | ampyx  (the three frozen submission bundles)
 --dataset  a battery id from datasets/data/ (see datasets/README.md), a path to a
            battery-format .jsonl, a variant handle (e.g. notus-lie-auditor), or a full
            HF slug following the <slug> + <slug>-labels convention
@@ -16,7 +16,7 @@
 
 The suspect and the data are coupled: --suspect selects which edition of a variant to
 load (notus-lie-auditor -> reinthal/notus-lie-auditor-<suspect>), and a full slug's
-suspect is read from its suffix. Methods that read the suspect (tiresias) therefore always
+suspect is read from its suffix. Methods that read the suspect (ampyx) therefore always
 interrogate the model that actually produced the replies. Judge-only methods (abantes,
 polypheides) never load the suspect.
 
@@ -47,7 +47,7 @@ VARIANTS = {
 METHODS = {
     "abantes": ("methods/abantes", "dyad_plainfuse"),
     "polypheides": ("methods/polypheides", "rhadamanthys_dyad_anchor2h"),
-    "tiresias": ("methods/tiresias", "rhadamanthys_m53_tp"),
+    "ampyx": ("methods/ampyx", "rhadamanthys_m53r"),
 }
 
 
@@ -64,7 +64,7 @@ def parse_args():
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--blind", action="store_true",
                     help="run without any suspect (judge legs only). Degrades methods that "
-                         "read the suspect (tiresias) — not recommended")
+                         "read the suspect (ampyx) — not recommended")
     return ap.parse_args()
 
 
