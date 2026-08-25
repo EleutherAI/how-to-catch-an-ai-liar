@@ -2,8 +2,9 @@
 
 Companion repository for the blog post *To catch a lie in the AI stream* — lessons from one
 month of detecting AI lies during **Aletheia's Quest**, a deception-detection competition run
-on [NDIF](https://ndif.us/). It contains our two main competition submissions, runnable in
-minimal form, and an inventory of the datasets we publish.
+on [NDIF](https://ndif.us/). It contains our two final competition submissions plus the black-box
+predecessor one of them wraps, all runnable in minimal form, the 27-distribution evaluation
+battery they were measured on, and an inventory of the datasets we publish.
 
 The competition: organisers fine-tuned model organisms to deceive, served them behind an API,
 and asked entrants to score every transcript between honest and deceptive. Entries were ranked
@@ -74,11 +75,16 @@ Suspect keys: `Qwen3.5-27B`, `gemma-3-27b-it`, `NVIDIA-Nemotron-3-Super-120B` (o
 id / `model:lora`). Judge-only methods (Abantes, Polypheides) never load the suspect, so its
 identity doesn't affect them. For Ampyx budget ~55 GB bf16 for a 27B suspect on top of
 the ~20 GB judge (both fit one 80 GB H100); the Nemotron-120B suspect (~240 GB) is NDIF-only.
-Give it room: both models are dispatched with `device_map="auto"`, so on a multi-GPU box the
-judge can spread across every visible device and leave the suspect short. Measured on this
-bundle, 4x48 GB makes the anchor OOM and the run degrade to a plain judge, while 7x48 GB runs
-the full stack — so pin the judge and the suspect to different devices with
-`CUDA_VISIBLE_DEVICES`, and use `--strict`.
+Pin them apart on a multi-GPU box. `device_map="auto"` lets whichever model is built first
+spread across every visible device and leave the other short: measured on this bundle,
+4x48 GB unpinned makes the anchor OOM and silently degrades the run to a plain judge. Pinning
+fixes it with fewer GPUs than throwing more at it does —
+
+```bash
+python run.py --method ampyx --dataset wf_assert --judge-gpus 0 --suspect-gpus 1,2 --strict
+```
+
+— and `--strict` is the safety net either way.
 
 Other flags: `--limit N` scores only the first N rows; `--batch-size` (default 8) trades
 VRAM for speed; `--backend ndif` runs the models remotely on NDIF, for those with an
@@ -88,14 +94,19 @@ back instead of running.
 
 Every run also prints a `health:` line naming what each leg actually did. This matters: these
 methods are built to degrade rather than crash, so a run whose anchor died and was replaced by
-a plain judge still prints a clean-looking AUROC. `jm43=TWO_PASS` means the anchor ran;
-`PLAIN_FALLBACK` means it did not, and the number you are reading is not the method's.
+a cheaper judge still prints a clean-looking AUROC. A faithful run says
+`anchor=DYAD shielded (n/n)` or `anchor=TWO_PASS`; anything reported as `DEGRADED:` means a
+leg fell back and the number you are reading is not this method's. `--strict` turns that into
+a non-zero exit.
 
-Try `wf_assert` vs `wf_denial` to see the claim-shape
-effect from the post: the same lies with an extractable false claim (caught) and as bare
-denials (missed).
+One thing the line reports is *not* a failure: `agentic gate 0/n`. Ampyx's activation leg is
+gated onto agentic record-versus-report rows and is meant to select none elsewhere — it
+selected none on all six counted board cells too.
 
-## The two methods
+Try `wf_assert` vs `wf_denial` to see the claim-shape effect from the post: the same lies with
+an extractable false claim (caught) and as bare denials (missed).
+
+## The methods
 
 ### Abantes — black-box submission (`methods/abantes/`)
 
@@ -182,6 +193,11 @@ cd methods/abantes        # or methods/polypheides, methods/ampyx
 DATASET_NAME=reinthal/notus-lie-auditor-Qwen3.5-27B python local_test.py
 ```
 
+The submitted notebooks (`Abantes.ipynb`, `Polypheides.ipynb`, `Ampyx.ipynb`) ship as fired,
+which means they expect a `submission/` directory on `sys.path` holding `harness.py`,
+`util.py` and `methods/`. In this layout those sit next to the notebook, so either change the
+`sys.path.insert(0, "submission")` line to `"."` or `ln -s . submission` inside the bundle.
+
 Add `ALETHEIA_LIMIT=16` for a smoke run; each bundle's default `ALETHEIA_METHOD` is its
 own submission. Ampyx loads the suspect model as well as the judge (a 27B suspect wants
 2×48 GB GPUs of its own; the Nemotron-120B cells are NDIF-only territory). The `RUN.md` files also document the
@@ -191,13 +207,40 @@ remain publicly downloadable.
 ## The datasets
 
 **The evaluation battery ships in this repo**: `datasets/data/` holds all 27 distributions
-(6,136 labelled rows, ~16 MB) with the manifest (`datasets/gauntlet.json`), a
-dependency-free loader (`datasets/load.py`), and per-distribution documentation of the
-lie types, claim shapes, evidence loci and dataset nulls in
-[`datasets/README.md`](datasets/README.md). Run Polypheides on any of them directly:
+(6,136 labelled rows, ~16 MB) with the manifest (`datasets/gauntlet.json`), a loader
+(`datasets/load.py`), and per-distribution documentation of the lie types, claim shapes,
+evidence loci and dataset nulls in [`datasets/README.md`](datasets/README.md). Derivation and
+what is or is not rebuildable: [`datasets/PROVENANCE.md`](datasets/PROVENANCE.md).
+
+`gauntlet.py` is the front end. The reference black-box judge is **already scored and
+cached**, so the whole table renders on a fresh clone with no GPU and no network:
+
+```bash
+python gauntlet.py report     # 25 scoreable distributions, AUROC + bootstrap CI vs the nulls
+python gauntlet.py check      # integrity invariants over data, manifest and cached vectors
+```
+
+Every number is printed beside that distribution's own **length null** and **blind null**, and
+any cell that fails to beat its blind null is marked `!` — on those, the score is not evidence
+the detector read the reply rather than the setup. Five of the reference judge's cells are.
+
+Add a column for one of the bundled methods, or recompute the nulls yourself:
+
+```bash
+python gauntlet.py score --method abantes --resume    # caches per-dist score vectors
+python gauntlet.py nulls --skip-blind                 # length null; needs no model
+```
+
+The claim-shape result from the post falls straight out of the table: `wf_assert` (lies with an
+extractable false claim) 0.872 for the plain judge, `wf_denial` (the same lies as bare denials)
+0.600. And the three agentic record-versus-report sets — `ga_insider`, `ga_insider_cot`,
+`lb_insider` — sit at chance, which is the gap Ampyx's activation leg is gated onto.
+
+To browse individual rows instead of aggregates:
 
 ```bash
 inspect eval examples/inspect_polypheides.py -T hf_dataset=datasets/data/wf_denial.jsonl
+inspect view
 ```
 
 `DATASETS.md` is the wider inventory: the datasets we publish on Hugging Face under
@@ -221,11 +264,13 @@ labels = load_dataset("reinthal/notus-lie-auditor-Qwen3.5-27B-labels", split="te
 
 ```
 run.py                 batteries-included runner: any method x any dataset, local or NDIF
+gauntlet.py            battery front end: report | score | nulls | check
 methods/abantes/       black-box submission (dyad_plainfuse): notebook, methods, harness, provenance
 methods/polypheides/   the DYAD anchor inside Abantes + basis of the local Inspect example
 methods/ampyx/         white-box submission (rhadamanthys_m53r): notebook, method stack, probe artifacts (.npz), provenance
 examples/              local-GPU Inspect port of the DYAD anchor + metrics script
-datasets/              the 27-distribution evaluation battery: data/, manifest, loader, docs
+datasets/              the 27-distribution evaluation battery: data/, manifest, loader,
+                       cached reference scores, provenance, licences, optional builders
 DATASETS.md            dataset inventory and battery manifest summary
 pyproject.toml         one dependency set for the whole local workflow (uv sync)
 ```

@@ -68,12 +68,17 @@ Nemotron-120B suspect (~240 GB) is realistically NDIF-only.
 ALETHEIA_METHOD=rhadamanthys_m53r DATASET_NAME=<...> python local_test.py
 ```
 
-> **Give it headroom.** Both models are dispatched with `device_map="auto"`, which lets the judge
-> spread over every visible GPU and can leave the suspect without room. Measured on this bundle:
-> on 4×48 GB the anchor OOMs and the run silently degrades to a plain judge; on 7×48 GB the same
-> command runs the full stack. Prefer one large GPU for the judge plus separate GPUs for the
-> suspect (`CUDA_VISIBLE_DEVICES`), and use `run.py --strict` so a degraded run fails loudly
-> instead of printing a clean-looking AUROC.
+> **Pin the two models apart.** Both are dispatched with `device_map="auto"`, which lets whichever
+> is built first spread over every visible GPU and leave the other without room. Measured on this
+> bundle: 4×48 GB unpinned makes the anchor OOM and the run silently degrade to a plain judge,
+> while `--judge-gpus 0 --suspect-gpus 1,2` runs the full stack on three of the same cards. Use
+> `run.py --strict` as the safety net so a degraded run fails loudly instead of printing a
+> clean-looking AUROC:
+>
+> ```bash
+> python ../../run.py --method ampyx --dataset wf_assert \
+>     --judge-gpus 0 --suspect-gpus 1,2 --strict
+> ```
 
 **Through NDIF** — this bundle ships the harness entry point (`remote_test.py`, `harness.py`,
 `util.py`), so it runs standalone from this directory:

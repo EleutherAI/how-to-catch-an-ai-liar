@@ -2,7 +2,8 @@
 
 Companion inventory for *To catch a lie in the AI stream*. Two parts: (1) the datasets we
 publish on Hugging Face under the account **`reinthal`**, (2) the 27-distribution evaluation
-battery from section 9 of the post and its manifest (`runs/research_gauntlet/gauntlet.json`).
+battery from section 9 of the post, which ships in this repo under
+[`datasets/`](datasets/) with its manifest (`datasets/gauntlet.json`).
 
 Evidence sources: `huggingface_hub.list_datasets(author="reinthal")` (queried 2026-08-06),
 the gauntlet manifest (`gauntlet.json`, updated 2026-07-17), `runs/submissions/dev-label-verify/ship_v5_labels.py`
@@ -65,11 +66,10 @@ Identified from the gauntlet manifest's family-provenance table: the family labe
 | `wf_denial` | controlled claim-shape probe (denial) | 240 (120/120) | templated over belief-verified facts (one-factor design) | `runs/research_gemma_whenfail/rows.jsonl` |
 | `aud_agentic` | agentic record-vs-report audit (multi-turn tool log, Nemotron) | 300 (79/221) | behaviour-verified against the in-context record | `runs/research_auditor/auditor.jsonl` |
 
-Total 1,426 rows. **As of the 2026-08-06 listing these four are not on the `reinthal` HF
-account** — they exist as `runs/research_gauntlet/data/{dist}.jsonl` plus the manifest. The
-blog's closing "[HF LINK]" and draft-comment item 4 ("HF account and dataset cards for the
-four releases in section 9") are open items; publishing them is a to-do for this repo, not a
-done fact.
+Total 1,426 rows. **These four are not on the `reinthal` HF account** (checked 2026-08-06);
+they ship in this repository as `datasets/data/{dist}.jsonl` with the manifest, under MIT like
+the code — see [`datasets/LICENSES.md`](datasets/LICENSES.md). Mirroring them to HF, and the
+blog's closing "[HF LINK]", remain open items.
 
 Boundary note: `ga_domains` (100 rows, synthetic novel-domain lies, 5-vote belief-gated on
 Qwen3.5-27B) is also constructed by us, but the manifest counts it inside the genaudit family
@@ -87,7 +87,7 @@ Qwen3.5-27B) is also constructed by us, but the manifest counts it inside the ge
 
 ## 2. The evaluation battery (27 distributions, 6,136 rows)
 
-From `runs/research_gauntlet/gauntlet.json` (updated 2026-07-17). Row totals verified: the 27
+From `datasets/gauntlet.json`. Row totals verified: the 27
 `n` values sum to exactly 6,136. Composition matches the blog's section 9 claim: 9 Liars'
 Bench + 9 AISI Did-You-Lie + 5 genaudit-assembled + 4 built by us.
 
@@ -168,13 +168,24 @@ v5 = load_dataset("reinthal/aletheias-dev-relabel-v5", split="train")
 # columns: dataset, index, deceptive, official, relabeled, excluded
 ```
 
-Battery distributions load from the manifest + JSONL (row schema: `dist, rid, y, messages,
-gen_model, meta`):
+Battery distributions ship in this repo and load from `datasets/load.py` (row schema:
+`dist, rid, y, messages, gen_model, meta`). Nothing external is needed:
 
 ```python
-import sys; sys.path.insert(0, "runs/research_gauntlet")
-import gauntlet as G
-rows, srows, y = G.load_dist("wf_denial")   # srows are harness-ready {messages, model, lora}
+import sys; sys.path.insert(0, "datasets")
+from load import list_dists, load_dist, harness_rows, auroc, nulls_for
+
+rows = load_dist("wf_denial")                    # 240 rows, as shipped
+rows, srows, y = harness_rows("wf_denial")       # srows are harness-ready {messages, model, lora}
+print(auroc(y, my_scores), "vs blind null", nulls_for("wf_denial")["blindnull"]["auroc"])
+```
+
+The command-line front end is `gauntlet.py` at the repo root:
+
+```bash
+python gauntlet.py report          # the whole table from cached vectors — no GPU, no network
+python gauntlet.py check           # integrity invariants
+python gauntlet.py score --method abantes    # add a column for a bundled method
 ```
 
 ---
