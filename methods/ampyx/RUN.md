@@ -68,12 +68,13 @@ Nemotron-120B suspect (~240 GB) is realistically NDIF-only.
 ALETHEIA_METHOD=rhadamanthys_m53r DATASET_NAME=<...> python local_test.py
 ```
 
-> **Pin the two models apart.** Both are dispatched with `device_map="auto"`, which lets whichever
-> is built first spread over every visible GPU and leave the other without room. Measured on this
-> bundle: 4×48 GB unpinned makes the anchor OOM and the run silently degrade to a plain judge,
-> while `--judge-gpus 0 --suspect-gpus 1,2` runs the full stack on three of the same cards. Use
-> `run.py --strict` as the safety net so a degraded run fails loudly instead of printing a
-> clean-looking AUROC:
+> **Pin the two models apart.** Both are dispatched with `device_map="auto"`, which plans across
+> every visible device as though it owned all of them. If one card is already partly occupied —
+> by another job, or by whichever model was built first — the second can OOM part-way through,
+> and the stack then degrades to a cheaper leg while still producing a full score vector.
+> Observed here: a run over four visible GPUs, one of them already held by an unrelated process,
+> fell back to a plain judge; the same command with the two models pinned to devices of their own
+> ran the full stack on three cards. Use `run.py --strict` so that failure is loud:
 >
 > ```bash
 > python ../../run.py --method ampyx --dataset wf_assert \

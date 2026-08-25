@@ -75,16 +75,19 @@ Suspect keys: `Qwen3.5-27B`, `gemma-3-27b-it`, `NVIDIA-Nemotron-3-Super-120B` (o
 id / `model:lora`). Judge-only methods (Abantes, Polypheides) never load the suspect, so its
 identity doesn't affect them. For Ampyx budget ~55 GB bf16 for a 27B suspect on top of
 the ~20 GB judge (both fit one 80 GB H100); the Nemotron-120B suspect (~240 GB) is NDIF-only.
-Pin them apart on a multi-GPU box. `device_map="auto"` lets whichever model is built first
-spread across every visible device and leave the other short: measured on this bundle,
-4x48 GB unpinned makes the anchor OOM and silently degrades the run to a plain judge. Pinning
-fixes it with fewer GPUs than throwing more at it does —
+Pin them apart on a multi-GPU box. `device_map="auto"` plans placement across every visible
+device as though it owned all of them, so if one card is already partly occupied — by another
+job, or by the model that was built first — the second model can OOM part-way through. The
+method then falls back to a cheaper leg and still prints a plausible AUROC. Observed here: a
+run over four visible GPUs, one of which another process was already holding, degraded to a
+plain judge; the same command with the two models pinned to devices of their own ran the full
+stack on three cards.
 
 ```bash
 python run.py --method ampyx --dataset wf_assert --judge-gpus 0 --suspect-gpus 1,2 --strict
 ```
 
-— and `--strict` is the safety net either way.
+`--strict` is the safety net either way: it turns a silent degradation into a non-zero exit.
 
 Other flags: `--limit N` scores only the first N rows; `--batch-size` (default 8) trades
 VRAM for speed; `--backend ndif` runs the models remotely on NDIF, for those with an
