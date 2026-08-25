@@ -180,9 +180,10 @@ def preflight_local(torch, method):
         sys.exit(
             "[run] --backend local needs CUDA, but torch.cuda.is_available() is False.\n"
             f"      torch {torch.__version__} was built for a CUDA version your driver may\n"
-            "      not support (uv.lock pins a CUDA 13 wheel). Install a matching torch, e.g.\n"
-            "        uv pip install --index-url https://download.pytorch.org/whl/cu126 "
-            "torch torchvision\n"
+            "      not support (uv.lock pins a CUDA 13 wheel). Install a matching torch --\n"
+            "      --reinstall is required, or uv keeps the wheel already installed:\n"
+            "        uv pip install --reinstall --index-url "
+            "https://download.pytorch.org/whl/cu126 torch torchvision\n"
             "      or run the models remotely with --backend ndif.")
     n = torch.cuda.device_count()
     tot = sum(torch.cuda.get_device_properties(i).total_memory for i in range(n)) / 2**30

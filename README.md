@@ -14,7 +14,10 @@ each). Entrants never saw the organisms and never read a labelled test row.
 ## Quick start
 
 Everything runs locally with nnsight — models on your own GPUs, no NDIF account or API
-key. The judge (Qwen3.5-9B) needs one ~24 GB GPU. One dependency set (`pyproject.toml`):
+key. The judge (Qwen3.5-9B) is ungated and needs one ~24 GB GPU. One dependency set
+(`pyproject.toml`). Budget roughly **28 GB on first run**: 25 MB of repo, ~8 GB of Python
+environment, and ~19 GB of judge weights fetched from the Hub the first time you score
+anything. Only `gauntlet.py report` and `gauntlet.py check` need none of it.
 
 ```bash
 # uv, if you don't have it: curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -28,11 +31,16 @@ python run.py --method abantes --dataset wf_assert --limit 16
 **CUDA build.** `uv.lock` pins a CUDA 13 torch wheel; on an older driver
 `torch.cuda.is_available()` is then `False`. `run.py --backend local` refuses to start in that
 case rather than falling back to CPU silently. If it does, install a torch matching your driver
-into the same environment, e.g. for CUDA 12.6:
+into the same environment — **`--reinstall` is required**, or uv treats the CUDA 13 wheel
+already present as satisfying `torch` and does nothing:
 
 ```bash
-uv pip install --index-url https://download.pytorch.org/whl/cu126 torch torchvision
+uv pip install --reinstall --index-url https://download.pytorch.org/whl/cu126 torch torchvision
 ```
+
+Swap `cu126` for the build your driver supports; `nvidia-smi` reports the CUDA version it
+targets. Verify with
+`python -c "import torch; print(torch.cuda.is_available())"` before re-running.
 
 `run.py` runs any of the three frozen submission methods (`abantes`, `polypheides`, `ampyx`)
 on any dataset:
@@ -73,8 +81,16 @@ python run.py --method ampyx --dataset dyl_varied_gemma3   # -> gemma-3-27b-it
 
 Suspect keys: `Qwen3.5-27B`, `gemma-3-27b-it`, `NVIDIA-Nemotron-3-Super-120B` (or a full HF
 id / `model:lora`). Judge-only methods (Abantes, Polypheides) never load the suspect, so its
-identity doesn't affect them. For Ampyx budget ~55 GB bf16 for a 27B suspect on top of
-the ~20 GB judge (both fit one 80 GB H100); the Nemotron-120B suspect (~240 GB) is NDIF-only.
+identity doesn't affect them.
+
+**One suspect is gated.** The judge (`Qwen/Qwen3.5-9B`) and the Qwen and Nemotron suspects are
+open, so the quick start needs no Hugging Face account. `google/gemma-3-27b-it` is gated: to run
+**Ampyx** on gemma data (`--suspect gemma-3-27b-it`, or battery distributions whose `gen_model`
+is gemma, such as `dyl_varied_gemma3`) you must accept Google's licence on the model page and
+export an `HF_TOKEN`. Abantes and Polypheides are unaffected — they never load it.
+
+For Ampyx budget ~55 GB bf16 for a 27B suspect on top of the ~20 GB judge (both fit one 80 GB
+H100); the Nemotron-120B suspect (~240 GB) is NDIF-only.
 Pin them apart on a multi-GPU box. `device_map="auto"` plans placement across every visible
 device as though it owned all of them, so if one card is already partly occupied — by another
 job, or by the model that was built first — the second model can OOM part-way through. The
@@ -203,7 +219,8 @@ which means they expect a `submission/` directory on `sys.path` holding `harness
 
 Add `ALETHEIA_LIMIT=16` for a smoke run; each bundle's default `ALETHEIA_METHOD` is its
 own submission. Ampyx loads the suspect model as well as the judge (a 27B suspect wants
-2×48 GB GPUs of its own; the Nemotron-120B cells are NDIF-only territory). The `RUN.md` files also document the
+2×48 GB GPUs of its own; the Nemotron-120B cells are NDIF-only territory). The `RUN.md`
+files also document the
 original competition dev-set invocations (`aletheias-quest/dev-*` slugs), which may not
 remain publicly downloadable.
 
@@ -233,6 +250,10 @@ Add a column for one of the bundled methods, or recompute the nulls yourself:
 python gauntlet.py score --method abantes --resume    # caches per-dist score vectors
 python gauntlet.py nulls --skip-blind                 # length null; needs no model
 ```
+
+`score` writes into `datasets/scores/`, which is tracked, so your own runs will show up as
+local modifications. `git checkout datasets/scores` restores the shipped reference vectors.
+`report` and `check` only read.
 
 The claim-shape result from the post falls straight out of the table: `wf_assert` (lies with an
 extractable false claim) 0.872 for the plain judge, `wf_denial` (the same lies as bare denials)
@@ -270,7 +291,8 @@ run.py                 batteries-included runner: any method x any dataset, loca
 gauntlet.py            battery front end: report | score | nulls | check
 methods/abantes/       black-box submission (dyad_plainfuse): notebook, methods, harness, provenance
 methods/polypheides/   the DYAD anchor inside Abantes + basis of the local Inspect example
-methods/ampyx/         white-box submission (rhadamanthys_m53r): notebook, method stack, probe artifacts (.npz), provenance
+methods/ampyx/         white-box submission (rhadamanthys_m53r): notebook, method stack,
+                       probe artifacts (.npz), provenance
 examples/              local-GPU Inspect port of the DYAD anchor + metrics script
 datasets/              the 27-distribution evaluation battery: data/, manifest, loader,
                        cached reference scores, provenance, licences, optional builders

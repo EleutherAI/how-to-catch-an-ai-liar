@@ -55,10 +55,15 @@ def main():
     ap.add_argument("--inspect", default=None, help="path to the inspect CLI (default: PATH)")
     args = ap.parse_args()
 
-    inspect = args.inspect or shutil.which("inspect")
+    # look next to the running interpreter first: `.venv/bin/python examples/...` without
+    # activating the venv is normal, and `inspect` lives right there.
+    sibling = os.path.join(os.path.dirname(sys.executable), "inspect")
+    inspect = (args.inspect
+               or (sibling if os.path.exists(sibling) else None)
+               or shutil.which("inspect"))
     if not inspect:
-        sys.exit("no `inspect` on PATH — activate the environment (`uv sync && source "
-                 ".venv/bin/activate`) or pass --inspect")
+        sys.exit("no `inspect` found next to this interpreter or on PATH — install it "
+                 "(`uv sync`) or pass --inspect")
     files = sorted(glob.glob(os.path.join(args.log_dir, "**", "*.eval"), recursive=True))
     if not files:
         sys.exit(f"no .eval logs under {args.log_dir!r}. Run, for example:\n"
